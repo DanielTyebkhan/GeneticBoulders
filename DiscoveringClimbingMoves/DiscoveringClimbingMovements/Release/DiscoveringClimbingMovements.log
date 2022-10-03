@@ -1,0 +1,16 @@
+﻿  ClimbingApp.cpp
+  ClippedGaussianSampling.cpp
+  ControlPBP.cpp
+  DiagonalGMM.cpp
+  DynamicMinMax.cpp
+  DynamicPdfSampler.cpp
+  EigenMathUtils.cpp
+  FileUtils.cpp
+  RenderCommands.cpp
+  RenderingClientDll_wrap.cpp
+  UnityOde.cpp
+     Creating library ..\ExeFile\RenderingClientDll.lib and object ..\ExeFile\RenderingClientDll.exp
+  Generating code
+  All 11344 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  DiscoveringClimbingMovements.vcxproj -> C:\Users\dkenp\TestingClimbingDir\DiscoveringClimbingMoves\DiscoveringClimbingMovements\..\ExeFile\RenderingClientDll.dll
