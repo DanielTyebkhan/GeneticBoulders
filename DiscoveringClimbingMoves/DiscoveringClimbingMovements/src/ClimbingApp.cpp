@@ -56,11 +56,9 @@ static const bool useOfflinePlanning = true;
 static const bool flag_capture_video = false;
 static int maxNumSimulatedPaths = 10;
 
-const int MOONBOARD_ROWS = 18;
-const int MOONBOARD_COLUMNS = 11;
-const string MOONBOARD_CONFIG_NAME = "moonboard_config.txt";
-static bool usingMoonboard = false;
-static int moonboardConfig[MOONBOARD_ROWS][MOONBOARD_COLUMNS] = { {0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0} };
+static const int MOONBOARD_ROWS = 18;
+static const int MOONBOARD_COLUMNS = 11;
+static const string MOONBOARD_CONFIG_NAME = "moonboard_config.txt";
 
 enum mCaseStudy{movingLimbs = 0, Energy = 1};
 //case study: {path with minimum moving limbs, path with minimum energy} among "maxNumSimulatedPaths" paths founds
@@ -142,6 +140,54 @@ void simLoop (int); /// simulation loop
 void runSimulation(int, char **); /// run simulation
 
 //WorkerThreadManager<int> *workerThreadManager;
+
+class MoonboardRoute
+{
+public:
+	int holds[MOONBOARD_ROWS][MOONBOARD_COLUMNS];
+	int startHold[2];
+	int endHold[2];
+
+	MoonboardRoute(int _holds[MOONBOARD_ROWS][MOONBOARD_COLUMNS], int _start[2], int _end[2]) 
+		: holds(), startHold(), endHold()
+	{
+		std::memcpy(holds, _holds, MOONBOARD_COLUMNS * MOONBOARD_ROWS * sizeof(int));
+		std::memcpy(startHold, _start, 2 * sizeof(int));
+		std::memcpy(endHold, _end, 2 * sizeof(int));
+	}
+
+	/**
+	 Format: 
+		moonboard grid
+		start hold
+		end hold
+		seed
+	**/
+	static MoonboardRoute * loadMoonboardConfig(string configPath, int *seed) 
+	{
+		int boardBuffer[MOONBOARD_ROWS][MOONBOARD_COLUMNS];
+		int startHold[2];
+		int endHold[2];
+		std::ifstream moonboardFile(configPath);
+		bool good = moonboardFile.good();
+		if (good) { 
+			for (int i = 0; i < MOONBOARD_ROWS; ++i) {
+				for (int j = 0; j < MOONBOARD_COLUMNS; ++j) 
+					moonboardFile >> boardBuffer[i][j];
+			}
+			moonboardFile >> startHold[0];
+			moonboardFile >> startHold[1];
+			moonboardFile >> endHold[0];
+			moonboardFile >> endHold[1];
+			if (moonboardFile.good())
+				moonboardFile >> *seed;
+			return &MoonboardRoute(boardBuffer, startHold, endHold);
+		}
+		return NULL;
+	}
+};
+
+static MoonboardRoute * moonboardConfig;
 
 enum mEnumTestCaseClimber
 {
@@ -10667,19 +10713,6 @@ void forwardSimulation(float _time)
 	}
 }
 
-bool readMoonboardConfig(string configPath, int boardBuffer[MOONBOARD_ROWS][MOONBOARD_COLUMNS], int *seed) 
-{
-	std::ifstream moonboardFile(configPath);
-	bool good = moonboardFile.good();
-	if (good) { 
-		for (int i = 0; i < MOONBOARD_ROWS; ++i) {
-			for (int j = 0; j < MOONBOARD_COLUMNS; ++j) 
-				moonboardFile >> boardBuffer[i][j];
-		}
-		moonboardFile >> *seed;
-	}
-	return good;
-}
 
 void EXPORT_API rcInit()
 {
@@ -10687,10 +10720,7 @@ void EXPORT_API rcInit()
 //void main(int argc, char **argv)
 //{
 	int seed = time(NULL);
-	if (readMoonboardConfig(MOONBOARD_CONFIG_NAME, moonboardConfig, &seed)) {
-		usingMoonboard = true;
-	}
-	else {
+	if (!(moonboardConfig = MoonboardRoute::loadMoonboardConfig(MOONBOARD_CONFIG_NAME, &seed))) {
 		char buff[100];
 		sprintf_s(buff, "settings_climber.txt");
 			
@@ -10717,7 +10747,7 @@ void EXPORT_API rcInit()
 	holdBodyindexT = true;
 	holdBodyindexI = 0; // first by body
 
-	mDemoTestClimber demoClimber = usingMoonboard ? mDemoTestClimber::Moonboard : mDemoTestClimber::DemoRoute1;
+	mDemoTestClimber demoClimber = moonboardConfig ? mDemoTestClimber::Moonboard : mDemoTestClimber::DemoRoute1;
 	mContext = new SimulationContext(testClimber, TestID, demoClimber, nRows, nColumns);
 	
 	BipedState startState;
