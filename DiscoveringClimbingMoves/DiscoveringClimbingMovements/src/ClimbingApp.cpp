@@ -20,6 +20,10 @@
 #include "RecursiveTCBSpline.h"
 #include "FileUtils.h"
 
+#include <iostream>;
+#include <fstream>;
+#include <string>;
+
 using namespace std::chrono;
 using namespace std;
 using namespace AaltoGames;
@@ -51,6 +55,12 @@ static bool pause = false;
 static const bool useOfflinePlanning = true;
 static const bool flag_capture_video = false;
 static int maxNumSimulatedPaths = 10;
+
+const int MOONBOARD_ROWS = 18;
+const int MOONBOARD_COLUMNS = 11;
+const string MOONBOARD_CONFIG_NAME = "moonboard_config.txt";
+static bool usingMoonboard = false;
+static int moonboardConfig[MOONBOARD_ROWS][MOONBOARD_COLUMNS] = { {0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0} };
 
 enum mCaseStudy{movingLimbs = 0, Energy = 1};
 //case study: {path with minimum moving limbs, path with minimum energy} among "maxNumSimulatedPaths" paths founds
@@ -10595,22 +10605,34 @@ void EXPORT_API rcInit()
 //	workerThreadManager=new WorkerThreadManager<int>(16);
 //void main(int argc, char **argv)
 //{
-	char buff[100];
-	sprintf_s(buff, "settings_climber.txt");
-		
-	FILE* rwFileStream;
-	std::string mfilename = buff;
-		
-	fopen_s(&rwFileStream , mfilename.c_str(), "r");
-
-	if (rwFileStream)
-	{
-		char buff2[100];
-		fgets(buff2, 100, rwFileStream);
-		sscanf_s(buff2, "%d,%d,%d", &nRows, &nColumns, &nTestNum);
-		fclose(rwFileStream);
+	std::ifstream moonboardFile(MOONBOARD_CONFIG_NAME);
+	if (moonboardFile.good()) {
+		usingMoonboard = true;
+		string line;
+		for (int i = 0; i < MOONBOARD_ROWS; ++i) {
+			for (int j = 0; j < MOONBOARD_COLUMNS; ++j) 
+				moonboardFile >> moonboardConfig[i][j];
+		}
 	}
-	nRows = 4; nColumns = 1;
+	else {
+		char buff[100];
+		sprintf_s(buff, "settings_climber.txt");
+			
+		FILE* rwFileStream;
+		std::string mfilename = buff;
+			
+		fopen_s(&rwFileStream , mfilename.c_str(), "r");
+
+		if (rwFileStream)
+		{
+			char buff2[100];
+			fgets(buff2, 100, rwFileStream);
+			sscanf_s(buff2, "%d,%d,%d", &nRows, &nColumns, &nTestNum);
+			fclose(rwFileStream);
+		}
+		nRows = 4; nColumns = 1;
+
+	}
 	srand(time(NULL));
 
 	advance_time = true;
@@ -10706,7 +10728,7 @@ void EXPORT_API rcUpdate()
 		if (myRRTPlanner->goal_nodes.size() > timeOfFindingMotions.size())
 			timeOfFindingMotions.push_back(total_time_elasped);
 	}
-	mContext->mDrawStuff(cBodyNum);
+	mContext->mDrawStuff(cBodyNum); // DAN: this draws the wall and holds
 //		myRRTPlanner->drawTree();
 //	}
 	/*else

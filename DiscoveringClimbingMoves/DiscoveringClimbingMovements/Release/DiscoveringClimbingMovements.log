@@ -1,16 +1,11 @@
 ﻿  ClimbingApp.cpp
-  ClippedGaussianSampling.cpp
-  ControlPBP.cpp
-  DiagonalGMM.cpp
-  DynamicMinMax.cpp
-  DynamicPdfSampler.cpp
-  EigenMathUtils.cpp
-  FileUtils.cpp
-  RenderCommands.cpp
-  RenderingClientDll_wrap.cpp
-  UnityOde.cpp
+c:\users\dkenp\source\repos\geneticboulders\discoveringclimbingmoves\discoveringclimbingmovements\src\climbingapp.cpp(23): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\dkenp\source\repos\geneticboulders\discoveringclimbingmoves\discoveringclimbingmovements\src\climbingapp.cpp(24): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\dkenp\source\repos\geneticboulders\discoveringclimbingmoves\discoveringclimbingmovements\src\climbingapp.cpp(25): warning C4067: unexpected tokens following preprocessor directive - expected a newline
      Creating library ..\ExeFile\RenderingClientDll.lib and object ..\ExeFile\RenderingClientDll.exp
   Generating code
-  All 11344 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  107 of 11347 functions ( 0.9%) were compiled, the rest were copied from previous compilation.
+    3 functions were new in current compilation
+    32 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
-  DiscoveringClimbingMovements.vcxproj -> C:\Users\dkenp\TestingClimbingDir\DiscoveringClimbingMoves\DiscoveringClimbingMovements\..\ExeFile\RenderingClientDll.dll
+  DiscoveringClimbingMovements.vcxproj -> C:\Users\dkenp\source\repos\GeneticBoulders\DiscoveringClimbingMoves\DiscoveringClimbingMovements\..\ExeFile\RenderingClientDll.dll
