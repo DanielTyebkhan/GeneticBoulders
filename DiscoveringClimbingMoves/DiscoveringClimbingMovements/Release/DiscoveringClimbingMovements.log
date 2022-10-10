@@ -4,8 +4,8 @@ c:\users\dkenp\source\repos\geneticboulders\discoveringclimbingmoves\discovering
 c:\users\dkenp\source\repos\geneticboulders\discoveringclimbingmoves\discoveringclimbingmovements\src\climbingapp.cpp(25): warning C4067: unexpected tokens following preprocessor directive - expected a newline
      Creating library ..\ExeFile\RenderingClientDll.lib and object ..\ExeFile\RenderingClientDll.exp
   Generating code
-  107 of 11347 functions ( 0.9%) were compiled, the rest were copied from previous compilation.
-    3 functions were new in current compilation
-    32 functions had inline decision re-evaluated but remain unchanged
+  8 of 11348 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+    1 functions were new in current compilation
+    15 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   DiscoveringClimbingMovements.vcxproj -> C:\Users\dkenp\source\repos\GeneticBoulders\DiscoveringClimbingMoves\DiscoveringClimbingMovements\..\ExeFile\RenderingClientDll.dll

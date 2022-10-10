@@ -148,7 +148,7 @@ enum mEnumTestCaseClimber
 	TestAngle = 0, TestCntroller = 1
 };
 
-enum mDemoTestClimber{DemoRoute1 = 1, DemoRoute2 = 2, DemoRoute3 = 3, DemoLongWall = 4, Demo45Wall = 5, Line = 6, DemoLongWallTest = 7, Demo45Wall2 = 8};
+enum mDemoTestClimber{DemoRoute1 = 1, DemoRoute2 = 2, DemoRoute3 = 3, DemoLongWall = 4, Demo45Wall = 5, Line = 6, DemoLongWallTest = 7, Demo45Wall2 = 8, Moonboard = 9};
 
 class CMAESTrajectoryResults
 {
@@ -1867,6 +1867,51 @@ public:
 				}
 			}
 			break;
+		case Moonboard:
+			// DAN: make this proper
+			cPos = getEndPointPosBones(SimulationContext::BodyName::BodyLeftLeg);
+			cPos[1] = 0.0f;
+			cPos[2] = 0.35f;
+			addHoldBodyToWorld(cPos); // leftLeg
+
+			rLegPos = cPos;
+			rLegPos[0] += 2 * betweenHolds;
+			addHoldBodyToWorld(rLegPos); // rightLeg
+
+			cPos[2] += 3 * betweenHolds + 0.36f;
+			addHoldBodyToWorld(cPos); // LeftHand
+
+			cPos[0] += 2 * betweenHolds;
+			addHoldBodyToWorld(cPos); // RightHand
+
+			cPos[2] = middleWallDegree.y() + betweenHolds * sinf(middleWallDegree.z());
+			cPos[1] += -betweenHolds * cosf(middleWallDegree.z());
+			addHoldBodyToWorld(cPos); // RightHand 1
+
+			cPos[0] -= 2 * betweenHolds;
+			addHoldBodyToWorld(cPos); // LeftHand 1
+
+			cPos[2] += 4 * betweenHolds * sinf(middleWallDegree.z());
+			cPos[1] += -4 * betweenHolds * cosf(middleWallDegree.z());
+			addHoldBodyToWorld(cPos); // LeftHand 2
+
+			cPos[0] += 2 * betweenHolds;
+			addHoldBodyToWorld(cPos); // RightHand 2
+
+			cPos[2] += 4 * betweenHolds * sinf(middleWallDegree.z());
+			cPos[1] += -4 * betweenHolds * cosf(middleWallDegree.z());
+			addHoldBodyToWorld(cPos); // LeftHand 2
+
+			cPos[0] -= 2 * betweenHolds;
+			addHoldBodyToWorld(cPos); // RightHand 2
+
+			cPos[2] += 4 * betweenHolds * sinf(middleWallDegree.z());
+			cPos[1] += -4 * betweenHolds * cosf(middleWallDegree.z());
+			addHoldBodyToWorld(cPos); // LeftHand 2
+
+			cPos[0] += 2 * betweenHolds;
+			addHoldBodyToWorld(cPos); // RightHand 2
+			break;
 		default:
 			break;
 		};
@@ -1876,7 +1921,30 @@ public:
 
 	Vector3 createWall(mDemoTestClimber DemoID)
 	{
-		if (!(DemoID == mDemoTestClimber::Demo45Wall || DemoID == mDemoTestClimber::Demo45Wall2))
+		if (DemoID == mDemoTestClimber::Moonboard) {
+			// starting from vertical wall
+			int cGeomID = odeCreateBox(5, 2 * boneRadius, 2);
+			odeGeomSetPosition(cGeomID, 0, (1.5) * boneRadius + mBiasWallY + 0.5f * boneRadius, 1.0f);
+			mENVGeoms.push_back(cGeomID);
+			mENVGeomTypes.push_back(BodyType::BodyBox);
+
+			// moonboard is a 40 degree wall
+			float l = 5.0f;
+			float angle = 40 * (PI/180);
+			float x_b = ((1.5) * boneRadius + mBiasWallY + 0.5f * boneRadius); // -boneRadius -0.5f * l * sinf(angle)
+			cGeomID = odeCreateBox(5, 2 * boneRadius, l);
+			odeGeomSetPosition(cGeomID, 0,  x_b - 0.5f * (l) * sinf(angle), 2 + 0.5f * boneRadius + 0.5f * (l) * cosf(angle)); // - tanf(angle) * x_b
+			
+			dMatrix3 R;
+			dRFromAxisAndAngle(R, 1, 0, 0, angle);
+			odeGeomSetRotation(cGeomID, R);
+
+			mENVGeoms.push_back(cGeomID);
+			mENVGeomTypes.push_back(BodyType::BodyBox);
+
+			return Vector3(0.0f, 2.0f, PI/2 - angle);
+		}
+		else if (!(DemoID == mDemoTestClimber::Demo45Wall || DemoID == mDemoTestClimber::Demo45Wall2))
 		{
 			int cGeomID = odeCreateBox(10, 2 * boneRadius, DemoID == mDemoTestClimber::DemoLongWallTest ? 300 : 15);
 			odeGeomSetPosition(cGeomID, 0, (1.5) * boneRadius + mBiasWallY + 0.5f * boneRadius, 5.0f);
@@ -10599,20 +10667,28 @@ void forwardSimulation(float _time)
 	}
 }
 
+bool readMoonboardConfig(string configPath, int boardBuffer[MOONBOARD_ROWS][MOONBOARD_COLUMNS], int *seed) 
+{
+	std::ifstream moonboardFile(configPath);
+	bool good = moonboardFile.good();
+	if (good) { 
+		for (int i = 0; i < MOONBOARD_ROWS; ++i) {
+			for (int j = 0; j < MOONBOARD_COLUMNS; ++j) 
+				moonboardFile >> boardBuffer[i][j];
+		}
+	}
+	moonboardFile >> *seed;
+	return good;
+}
 
 void EXPORT_API rcInit()
 {
 //	workerThreadManager=new WorkerThreadManager<int>(16);
 //void main(int argc, char **argv)
 //{
-	std::ifstream moonboardFile(MOONBOARD_CONFIG_NAME);
-	if (moonboardFile.good()) {
+	int seed = time(NULL);
+	if (readMoonboardConfig(MOONBOARD_CONFIG_NAME, moonboardConfig, &seed)) {
 		usingMoonboard = true;
-		string line;
-		for (int i = 0; i < MOONBOARD_ROWS; ++i) {
-			for (int j = 0; j < MOONBOARD_COLUMNS; ++j) 
-				moonboardFile >> moonboardConfig[i][j];
-		}
 	}
 	else {
 		char buff[100];
@@ -10631,9 +10707,8 @@ void EXPORT_API rcInit()
 			fclose(rwFileStream);
 		}
 		nRows = 4; nColumns = 1;
-
 	}
-	srand(time(NULL));
+	srand(seed);
 
 	advance_time = true;
 	FLAG_END_PROGRAM = false;
@@ -10642,7 +10717,8 @@ void EXPORT_API rcInit()
 	holdBodyindexT = true;
 	holdBodyindexI = 0; // first by body
 
-	mContext = new SimulationContext(testClimber, TestID, mDemoTestClimber::DemoRoute1, nRows, nColumns);
+	mDemoTestClimber demoClimber = usingMoonboard ? mDemoTestClimber::Moonboard : mDemoTestClimber::DemoRoute1;
+	mContext = new SimulationContext(testClimber, TestID, demoClimber, nRows, nColumns);
 	
 	BipedState startState;
 	if (!testClimber)
