@@ -10676,8 +10676,8 @@ bool readMoonboardConfig(string configPath, int boardBuffer[MOONBOARD_ROWS][MOON
 			for (int j = 0; j < MOONBOARD_COLUMNS; ++j) 
 				moonboardFile >> boardBuffer[i][j];
 		}
+		moonboardFile >> *seed;
 	}
-	moonboardFile >> *seed;
 	return good;
 }
 
