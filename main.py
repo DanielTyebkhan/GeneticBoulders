@@ -1,5 +1,6 @@
 import structs
 import ribs_interface
+import constants
 
 if __name__ == '__main__':
     params = structs.MEParams(
