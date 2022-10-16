@@ -1,2 +1,4 @@
 venv/
 *.ipch
+DiscoveringClimbingMoves/.vs/*
+DiscoveringClimbingMoves/DiscoveringClimbingMovements/Release/*
