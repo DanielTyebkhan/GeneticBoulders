@@ -1965,15 +1965,19 @@ public:
 		goal_pos = cPos;
 	}
 
+	// creates wall but not holds
 	Vector3 createWall(mDemoTestClimber DemoID)
 	{
 		if (DemoID == mDemoTestClimber::Moonboard) {
-			// starting from vertical wall
-			int cGeomID = odeCreateBox(5, 2 * boneRadius, 2);
+			int footholdSegmentHeight = 1;
+
+			// vertical portion (for footholds on the moonboard)
+			int cGeomID = odeCreateBox(5, 2 * boneRadius, footholdSegmentHeight);
 			odeGeomSetPosition(cGeomID, 0, (1.5) * boneRadius + mBiasWallY + 0.5f * boneRadius, 1.0f);
 			mENVGeoms.push_back(cGeomID);
 			mENVGeomTypes.push_back(BodyType::BodyBox);
 
+			// angled portion
 			// moonboard is a 40 degree wall
 			float l = 5.0f;
 			float angle = 40 * (PI/180);
