@@ -1,4 +1,5 @@
 venv/
 *.ipch
+**.pyc
 DiscoveringClimbingMoves/.vs/*
 DiscoveringClimbingMoves/DiscoveringClimbingMovements/Release/*
