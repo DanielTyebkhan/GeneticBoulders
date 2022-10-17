@@ -1,7 +1,8 @@
 from typing import List, Tuple
 from dataclasses import dataclass
-import random
 from uuid import UUID, uuid1
+
+A_OFFSET = 65
 
 @dataclass 
 class MEParams:
@@ -26,10 +27,10 @@ class MoonBoardRouteHold:
     is_end: bool
 
     def from_string(coords: str, is_start=False, is_end=False):
-        return MoonBoardRouteHold(row=int(coords[1:]), col=int(coords[0]), is_start=is_start, is_end=is_end)
+        return MoonBoardRouteHold(row=int(coords[1:]) - 1, col=ord(coords[0]) - A_OFFSET, is_start=is_start, is_end=is_end)
 
     def get_coordinate_string(self):
-        return chr(65 + self.row) + str(self.col)
+        return chr(A_OFFSET + self.row) + str(self.col)
 
     def to_dict(self):
         return {
@@ -57,9 +58,6 @@ class MoonboardRoute:
         all_holds.extend([MoonBoardRouteHold.from_string(h, is_start=True) for h in start])
         all_holds.append(MoonBoardRouteHold.from_string(end, is_end=True))
         return MoonboardRoute(all_holds)
-
-    def to_dict(self):
-        return {'moves': self.holds}
 
     def get_id_str(self):
         return str(self.id)
