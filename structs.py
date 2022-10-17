@@ -21,12 +21,15 @@ class Coordinate:
 @dataclass
 class MoonBoardRouteHold:
     row: int
-    col: str
+    col: int
     is_start: bool
     is_end: bool
 
     def from_string(coords: str, is_start=False, is_end=False):
-        return MoonBoardRouteHold(row=int(coords[1:]), col=coords[0], is_start=is_start, is_end=is_end)
+        return MoonBoardRouteHold(row=int(coords[1:]), col=int(coords[0]), is_start=is_start, is_end=is_end)
+
+    def get_coordinate_string(self):
+        return chr(65 + self.row) + str(self.col)
 
     def to_dict(self):
         return {
@@ -69,6 +72,18 @@ class MoonboardRoute:
     def from_list(ls: List):
         return MoonboardRoute(start_left=ls[0], start_right=ls[1], end=ls[2], holds=ls[3:])
 
-    def __rand_column():
-        return random.randint(0, MoonboardRoute.MOONBOARD_COLUMNS)
+    def num_holds(self):
+        return len(self.holds)
+
+    def num_starting_holds(self):
+        return len(self.starting_holds())
+
+    def num_ending_holds(self):
+        return len(self.ending_holds())
+
+    def starting_holds(self):
+        return [h for h in self.holds if h.is_start]
+
+    def ending_holds(self):
+        return [h for h in self.holds if h.is_end]
 
