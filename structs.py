@@ -18,6 +18,7 @@ class Coordinate:
     x: int
     y: int
 
+@dataclass
 class MoonBoardRouteHold:
     row: int
     col: str
@@ -57,6 +58,9 @@ class MoonboardRoute:
     def to_dict(self):
         return {'moves': self.holds}
 
+    def get_id_str(self):
+        return str(self.id)
+
     '''
     ls should be of form
         [start, end, ...holds]
@@ -68,9 +72,3 @@ class MoonboardRoute:
     def __rand_column():
         return random.randint(0, MoonboardRoute.MOONBOARD_COLUMNS)
 
-    def randomize():
-        return MoonboardRoute(
-            start_left=MoonboardRoute.__rand_column(), 
-            start_right=MoonboardRoute.__rand_column(),
-            end=MoonboardRoute.__rand_column()
-            holds=[random.randint(0,1) for _ in range(MoonboardRoute.MOONBOARD_COLUMNS * MoonboardRoute.MOONBOARD_ROWS)])
