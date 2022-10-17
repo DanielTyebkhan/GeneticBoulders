@@ -1,1 +1,1 @@
-# GenetricBoulders
+# GeneticBoulders
