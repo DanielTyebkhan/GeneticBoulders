@@ -1,6 +1,7 @@
 from typing import List, Tuple
 from dataclasses import dataclass
 import random
+from uuid import UUID, uuid1
 
 @dataclass 
 class MEParams:
@@ -17,16 +18,44 @@ class Coordinate:
     x: int
     y: int
 
+class MoonBoardRouteHold:
+    row: int
+    col: str
+    is_start: bool
+    is_end: bool
+
+    def from_string(coords: str, is_start=False, is_end=False):
+        return MoonBoardRouteHold(row=coords[1], col=coords[0], is_start=is_start, is_end=is_end)
+
+    def to_dict(self):
+        return {
+            'Description': self.col + str(self.row), 
+            'IsStart': self.is_start,
+            'IsEnd': self.is_end
+        }
+
 
 @dataclass
 class MoonboardRoute:
     MOONBOARD_COLUMNS = 11
     MOONBOARD_ROWS = 18
+    INVALID_COORDS = []
 
-    start_left: int
-    start_right: int
-    end: int
-    holds: List[int]
+    holds: List[MoonBoardRouteHold]
+    id: UUID
+
+    def __init__(self, holds: List[MoonBoardRouteHold]):
+        self.id = uuid1()
+        self.holds = holds
+
+    def from_hold_strings(holds: List[str], start: List[str], end: str):
+        all_holds = [MoonBoardRouteHold.from_string(h) for h in holds]
+        all_holds.extend([MoonBoardRouteHold.from_string(h, is_start=True) for h in start])
+        all_holds.append(MoonBoardRouteHold.from_string(end, is_end=True))
+        return MoonboardRoute(all_holds)
+
+    def to_dict(self):
+        return {'moves': self.holds}
 
     '''
     ls should be of form

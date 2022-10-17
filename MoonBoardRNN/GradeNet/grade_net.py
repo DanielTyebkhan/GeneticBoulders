@@ -9,6 +9,9 @@ from keras.layers.core import Dense
 from keras.layers import Flatten, LSTM, Masking
 from keras.models import Model
 from keras.layers import Input
+from GradeNet.model_helper import convert_num_to_V_grade
+
+from structs import MoonboardRoute
 
 class GradeNet:
 	def __init__(self):
@@ -52,3 +55,10 @@ class GradeNet:
 
 	def load_pretrained_weights(self, weights_path):
 		self.__model.load_weights(weights_path)
+
+	def grade_route(self, route: MoonboardRoute) -> int:
+		pred = self.__model.predict(GradeNet.route_to_input(route))
+		return convert_num_to_V_grade(pred)
+
+	def __route_to_input(route: MoonboardRoute):
+		return 
