@@ -25,7 +25,7 @@ class MoonBoardRouteHold:
     is_end: bool
 
     def from_string(coords: str, is_start=False, is_end=False):
-        return MoonBoardRouteHold(row=coords[1], col=coords[0], is_start=is_start, is_end=is_end)
+        return MoonBoardRouteHold(row=int(coords[1:]), col=coords[0], is_start=is_start, is_end=is_end)
 
     def to_dict(self):
         return {
