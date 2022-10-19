@@ -16,10 +16,13 @@ class MEParams:
     iterations: int
 
 
-@dataclass
-class Coordinate:
-    x: int
-    y: int
+def moonboard_row_to_index(row: int) -> int:
+    return row - 1
+
+
+def moonboard_col_to_index(col: str) -> int:
+    return ord(col) - A_OFFSET
+
 
 @dataclass
 class MoonBoardHold:
@@ -27,7 +30,7 @@ class MoonBoardHold:
     col: int
 
     def from_string(coords: str):
-        return MoonBoardHold(row=int(coords[1:]) - 1, col=ord(coords[0]) - A_OFFSET)
+        return MoonBoardHold(row=moonboard_row_to_index(int(coords[1:])), col=moonboard_col_to_index(coords[0]))
 
     def from_string_list(strlist: List[str]):
         return [MoonBoardHold.from_string(s) for s in strlist]
