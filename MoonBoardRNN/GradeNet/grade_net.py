@@ -1,6 +1,7 @@
 """
 Adapted from Evaluate_Generated_Output_v3.py
 """
+import pathlib
 import numpy as np
 import os
 import tensorflow as tf
@@ -9,14 +10,15 @@ from keras.layers.core import Dense
 from keras.layers import Flatten, LSTM, Masking
 from keras.models import Model
 from keras.layers import Input
-from GradeNet.model_helper import convert_num_to_V_grade
+from MoonBoardRNN.BetaMove.BetaMove import route_to_x_vectors
+from MoonBoardRNN.GradeNet.model_helper import convert_num_to_V_grade
 
 from structs import MoonBoardRoute
 
 class GradeNet:
 	def __init__(self):
 		self.__model = GradeNet.create_model()
-		dirname = os.Path(__file__)
+		dirname = pathlib.Path(__file__).parent
 		filepath = os.path.join(dirname, 'GradeNet.h5')
 		self.load_pretrained_weights(filepath)
 
@@ -57,8 +59,8 @@ class GradeNet:
 		self.__model.load_weights(weights_path)
 
 	def grade_route(self, route: MoonBoardRoute) -> int:
-		pred = self.__model.predict(GradeNet.route_to_input(route))
+		pred = self.__model.predict(GradeNet.__route_to_input(route))
 		return convert_num_to_V_grade(pred)
 
 	def __route_to_input(route: MoonBoardRoute):
-		return 
+		return route_to_x_vectors(route)
