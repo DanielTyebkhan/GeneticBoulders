@@ -24,18 +24,19 @@ def __load_feature_dict():
     return feature_dict
 
 def route_to_hold_vectors(route: MoonBoardRoute):
-    x_vectors = np.zeros((10, route.num_holds()))
-    feature_dict = __load_feature_dict()
-    for i, hold in enumerate(route.holds):
-        x, y = hold.col, hold.row
-        x_vectors[0:6, i] = feature_dict[(x, y)] # hand feature encoding
-        x_vectors[6:8, i] = [x, y] # coordinate encoding
-    n_holds = route.num_holds()
-    n_start = route.num_starting_holds()
-    n_end = route.num_ending_holds()
-    x_vectors[8:, 0:n_start] = np.array([[1], [0]])
-    x_vectors[8:, n_holds - n_end:] = np.array([[0], [1]])
-    return x_vectors
+	holds = route.get_all_holds()
+	n_holds = len(holds)
+	n_start = route.num_starting_holds()
+	n_end = route.num_end_holds()
+	x_vectors = np.zeros((10, n_holds))
+	feature_dict = __load_feature_dict()
+	for i, hold in enumerate(holds):
+		x, y = hold.col, hold.row
+		x_vectors[0:6, i] = feature_dict[(x, y)] # hand feature encoding
+		x_vectors[6:8, i] = [x, y] # coordinate encoding
+	x_vectors[8:, 0:n_start] = np.array([[1], [0]])
+	x_vectors[8:, n_holds - n_end:] = np.array([[0], [1]])
+	return x_vectors
 
 def beta_to_x_vectors(beta: ph.beta):
 	"""

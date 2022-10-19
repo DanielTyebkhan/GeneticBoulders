@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple, TypeAlias
+from typing import List, Optional, Tuple
 from dataclasses import dataclass
 from uuid import UUID, uuid1
 import uuid
@@ -39,37 +39,43 @@ class MoonBoardHold:
         return chr(A_OFFSET + self.row) + str(self.col)
 
 
-MoonBoardHolds: TypeAlias = List[MoonBoardHold]
+MoonBoardHolds = List[MoonBoardHold]
 
 
 @dataclass
-class MoonboardRoute:
+class MoonBoardRoute:
     MOONBOARD_COLUMNS = 11
     MOONBOARD_ROWS = 18
     INVALID_COORDS = []
 
     mid_holds: MoonBoardHolds
     start_holds: MoonBoardHolds
-    end_hold: MoonBoardHold
+    end_holds: MoonBoardHolds
     id: UUID
 
-    def __init__(self, start_holds: MoonBoardHolds, mid_holds: MoonBoardHolds, end_hold: MoonBoardHold, id: Optional[UUID] = None):
+    def __init__(self, start_holds: MoonBoardHolds, mid_holds: MoonBoardHolds, end_holds: MoonBoardHolds, id: Optional[UUID] = None):
         self.id = id or uuid1()
         self.start_holds = start_holds
         self.mid_holds = mid_holds
-        self.end_hold = end_hold
+        self.end_holds = end_holds
 
-    def from_hold_strings(start: List[str], mid: List[str], end: str):
+    def from_hold_strings(start: List[str], mid: List[str], end: List[str]):
         start_holds = MoonBoardHold.from_string_list(start)
         mid_holds = MoonBoardHold.from_string_list(mid)
-        end_hold = MoonBoardHold.from_string(end)
-        return MoonboardRoute(start_holds, mid_holds, end_hold)
+        end_holds = MoonBoardHold.from_string_list(end)
+        return MoonBoardRoute(start_holds, mid_holds, end_holds)
 
     def get_id_str(self):
         return str(self.id)
 
     def num_holds(self):
-        return len(self.holds)
+        return self.num_starting_holds + len(self.start_holds) + self.num_end_holds
 
     def num_starting_holds(self):
         return len(self.start_holds)
+
+    def num_end_holds(self):
+        return len(self.end_holds)
+
+    def get_all_holds(self) -> MoonBoardHolds:
+        return self.start_holds + self.mid_holds + self.end_holds
