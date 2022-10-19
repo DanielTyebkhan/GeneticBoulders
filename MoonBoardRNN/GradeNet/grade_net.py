@@ -59,8 +59,6 @@ class GradeNet:
 		self.__model.load_weights(weights_path)
 
 	def grade_route(self, route: MoonBoardRoute) -> int:
-		pred = self.__model.predict(GradeNet.__route_to_input(route))
+		encoded_route = route_to_x_vectors(route)
+		pred = self.__model.predict(encoded_route)
 		return convert_num_to_V_grade(pred)
-
-	def __route_to_input(route: MoonBoardRoute):
-		return route_to_x_vectors(route)
