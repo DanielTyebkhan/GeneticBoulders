@@ -10,7 +10,7 @@ def run_mapelites(params: structs.MEParams, report_frequency: int=25):
     emitters = [
         ribs.emitters.ImprovementEmitter(
             archive, 
-            structs.MoonboardRoute.randomize(),
+            structs.MoonBoardRoute.randomize(),
             params.sigma_0,
             params.batch_size) for _ in range(params.num_emitters)
     ]

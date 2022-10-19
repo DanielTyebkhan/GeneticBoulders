@@ -1,8 +1,10 @@
-from typing import List, Tuple
+from typing import List, Optional, Tuple, TypeAlias
 from dataclasses import dataclass
 from uuid import UUID, uuid1
+import uuid
 
 A_OFFSET = 65
+
 
 @dataclass 
 class MEParams:
@@ -20,24 +22,21 @@ class Coordinate:
     y: int
 
 @dataclass
-class MoonBoardRouteHold:
+class MoonBoardHold:
     row: int
     col: int
-    is_start: bool
-    is_end: bool
 
-    def from_string(coords: str, is_start=False, is_end=False):
-        return MoonBoardRouteHold(row=int(coords[1:]) - 1, col=ord(coords[0]) - A_OFFSET, is_start=is_start, is_end=is_end)
+    def from_string(coords: str):
+        return MoonBoardHold(row=int(coords[1:]) - 1, col=ord(coords[0]) - A_OFFSET)
 
-    def get_coordinate_string(self):
+    def from_string_list(strlist: List[str]):
+        return [MoonBoardHold.from_string(s) for s in strlist]
+
+    def to_coordinate_string(self) -> str:
         return chr(A_OFFSET + self.row) + str(self.col)
 
-    def to_dict(self):
-        return {
-            'Description': self.col + str(self.row), 
-            'IsStart': self.is_start,
-            'IsEnd': self.is_end
-        }
+
+MoonBoardHolds: TypeAlias = List[MoonBoardHold]
 
 
 @dataclass
@@ -46,42 +45,28 @@ class MoonboardRoute:
     MOONBOARD_ROWS = 18
     INVALID_COORDS = []
 
-    holds: List[MoonBoardRouteHold]
+    mid_holds: MoonBoardHolds
+    start_holds: MoonBoardHolds
+    end_hold: MoonBoardHold
     id: UUID
 
-    def __init__(self, holds: List[MoonBoardRouteHold]):
-        self.id = uuid1()
-        self.holds = holds
+    def __init__(self, start_holds: MoonBoardHolds, mid_holds: MoonBoardHolds, end_hold: MoonBoardHold, id: Optional[UUID] = None):
+        self.id = id or uuid1()
+        self.start_holds = start_holds
+        self.mid_holds = mid_holds
+        self.end_hold = end_hold
 
-    def from_hold_strings(holds: List[str], start: List[str], end: str):
-        all_holds = [MoonBoardRouteHold.from_string(h) for h in holds]
-        all_holds.extend([MoonBoardRouteHold.from_string(h, is_start=True) for h in start])
-        all_holds.append(MoonBoardRouteHold.from_string(end, is_end=True))
-        return MoonboardRoute(all_holds)
+    def from_hold_strings(start: List[str], mid: List[str], end: str):
+        start_holds = MoonBoardHold.from_string_list(start)
+        mid_holds = MoonBoardHold.from_string_list(mid)
+        end_hold = MoonBoardHold.from_string(end)
+        return MoonboardRoute(start_holds, mid_holds, end_hold)
 
     def get_id_str(self):
         return str(self.id)
-
-    '''
-    ls should be of form
-        [start, end, ...holds]
-    where start
-    '''
-    def from_list(ls: List):
-        return MoonboardRoute(start_left=ls[0], start_right=ls[1], end=ls[2], holds=ls[3:])
 
     def num_holds(self):
         return len(self.holds)
 
     def num_starting_holds(self):
-        return len(self.starting_holds())
-
-    def num_ending_holds(self):
-        return len(self.ending_holds())
-
-    def starting_holds(self):
-        return [h for h in self.holds if h.is_start]
-
-    def ending_holds(self):
-        return [h for h in self.holds if h.is_end]
-
+        return len(self.start_holds)

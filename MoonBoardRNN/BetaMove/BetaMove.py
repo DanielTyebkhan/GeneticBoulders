@@ -2,13 +2,13 @@ import os
 import pathlib
 import pandas as pd
 import numpy as np
-from structs import MoonboardRoute
+from structs import MoonBoardRoute
 import MoonBoardRNN.BetaMove.preprocessing_helper as ph
 
-def route_to_x_vectors(route: MoonboardRoute):
+def route_to_x_vectors(route: MoonBoardRoute):
 	route_id = route.get_id_str()
 	data_dict = {route_id: route_to_hold_vectors(route)}
-	beta = ph.produce_sequence(route_id, data_dict)[0]
+	beta = ph.produce_sequence(route_id, data_dict, printout=True)[0]
 	x_vectors = beta_to_x_vectors(beta)
 	return x_vectors
 
@@ -23,7 +23,7 @@ def __load_feature_dict():
 			list(feature_item['Difficulties'])).astype(int)
     return feature_dict
 
-def route_to_hold_vectors(route: MoonboardRoute):
+def route_to_hold_vectors(route: MoonBoardRoute):
     x_vectors = np.zeros((10, route.num_holds()))
     feature_dict = __load_feature_dict()
     for i, hold in enumerate(route.holds):

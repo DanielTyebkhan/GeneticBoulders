@@ -5,6 +5,6 @@ from dataclasses import dataclass
 class SimulationParams:
     dummy: int
 
-def run_simulation(route: structs.MoonboardRoute, params: SimulationParams) -> float:
+def run_simulation(route: structs.MoonBoardRoute, params: SimulationParams) -> float:
     return 0.0
     
