@@ -7,6 +7,7 @@ import numpy as np
 from structs import MoonBoardRoute
 import MoonBoardRNN.BetaMove.preprocessing_helper as ph
 
+
 def classify_and_reorganize_data_ga(route: MoonBoardRoute):
 	n_start = route.num_starting_holds()
 	n_mid = route.num_mid_holds()
@@ -43,7 +44,8 @@ def generate_organized_sequence_data(hold_vectors):
 
 def route_to_x_vectors(route: MoonBoardRoute):
 	route_id = route.get_id_str()
-	data_dict = {route_id: route_to_hold_vectors(route)}
+	# data_dict = {route_id: route_to_hold_vectors(route)}
+	data_dict = {route_id: classify_and_reorganize_data_ga(route)}
 	beta = ph.produce_sequence(route_id, data_dict, printout=True)[0]
 	x_vectors = beta_to_x_vectors(beta)
 	return x_vectors
@@ -80,3 +82,12 @@ def beta_to_x_vectors(beta: ph.beta):
 		x_vectors[14:21, orderOfMove] = moveInfoDict['FootPlacement']
 		x_vectors[21, orderOfMove] = moveInfoDict['MoveSuccessRate']
 	return x_vectors
+
+def x_vectors_to_matrix(x_vectors):
+	"""
+	Pad with 0 vectors to get correct input shape
+	"""
+	matrix = np.zeros((12, 22))
+	x_data = x_vectors.T
+	matrix[0:x_data.shape[0], :] = x_data
+	return matrix
