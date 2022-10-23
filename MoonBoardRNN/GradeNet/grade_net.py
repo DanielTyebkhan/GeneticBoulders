@@ -2,6 +2,7 @@
 Adapted from Evaluate_Generated_Output_v3.py
 """
 import pathlib
+from sys import setprofile
 import numpy as np
 import os
 import tensorflow as tf
@@ -10,7 +11,7 @@ from keras.layers.core import Dense
 from keras.layers import Flatten, LSTM, Masking
 from keras.models import Model
 from keras.layers import Input
-from MoonBoardRNN.BetaMove.BetaMove import route_to_x_vectors
+from MoonBoardRNN.BetaMove.BetaMove import classify_and_reorganize_data_ga, route_to_x_vectors
 from MoonBoardRNN.GradeNet.model_helper import convert_num_to_V_grade
 
 from structs import MoonBoardRoute
@@ -59,6 +60,7 @@ class GradeNet:
 		self.__model.load_weights(weights_path)
 
 	def grade_route(self, route: MoonBoardRoute) -> int:
-		encoded_route = route_to_x_vectors(route)
-		pred = self.__model.predict(encoded_route)
-		return convert_num_to_V_grade(pred)
+		step1 = classify_and_reorganize_data_ga(route)
+		# encoded_route = route_to_x_vectors(route)
+		# pred = self.__model.predict(encoded_route)
+		# return convert_num_to_V_grade(pred)

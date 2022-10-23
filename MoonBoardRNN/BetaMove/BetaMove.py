@@ -1,9 +1,45 @@
+from concurrent.futures import process
 import os
 import pathlib
+import re
 import pandas as pd
 import numpy as np
 from structs import MoonBoardRoute
 import MoonBoardRNN.BetaMove.preprocessing_helper as ph
+
+def classify_and_reorganize_data_ga(route: MoonBoardRoute):
+	n_start = route.num_starting_holds()
+	n_mid = route.num_mid_holds()
+	n_hold = route.num_holds()
+	start_sorted = sorted(route.start_holds, key=lambda h: h.row)
+	mid_sorted = sorted(route.mid_holds, key=lambda h: h.row)
+	end_sorted = sorted(route.end_holds, key=lambda h: h.row)
+	all_holds = start_sorted + mid_sorted + end_sorted
+
+	x_vectors = np.zeros((10, n_hold))
+	feature_dict = __load_feature_dict()
+	for i, hold in enumerate(all_holds):
+		x, y = hold.col, hold.row
+		x_vectors[0:6, i] = feature_dict[(x, y)] # hand feature encoding
+		x_vectors[6:8, i] = [x, y] # coordinate encoding
+	x_vectors[8:, 0:n_start] = np.array([[1], [0]])
+	x_vectors[8:, n_start + n_mid:] = np.array([[0], [1]])
+	return x_vectors
+
+def produce_sequence(hold_vectors):
+	out = ph.produce_sequence(0, {0: hold_vectors}, 1)
+	return out[0]
+
+def generate_organized_sequence_data(hold_vectors):
+	beta = produce_sequence(hold_vectors)
+	moves_info = ph.moveGenerator(beta)
+	# TODO: double check that this is correct for encoding move difficulty
+	moves_success = [100] + [m['MoveSuccessRate'][0] for m in moves_info] + [100]
+	res = np.vstack([
+		hold_vectors[6:8, beta.handSequence],
+		(np.array(beta.handOperator) == 'LH')*(-1) + (np.array(beta.handOperator) == 'RH')*1,
+		moves_success])
+	return res
 
 def route_to_x_vectors(route: MoonBoardRoute):
 	route_id = route.get_id_str()
@@ -22,21 +58,6 @@ def __load_feature_dict():
         feature_dict[(int(feature_item['X_coord']), int(feature_item['Y_coord']))] = np.array(
 			list(feature_item['Difficulties'])).astype(int)
     return feature_dict
-
-def route_to_hold_vectors(route: MoonBoardRoute):
-	holds = route.get_all_holds()
-	n_holds = len(holds)
-	n_start = route.num_starting_holds()
-	n_end = route.num_end_holds()
-	x_vectors = np.zeros((10, n_holds))
-	feature_dict = __load_feature_dict()
-	for i, hold in enumerate(holds):
-		x, y = hold.col, hold.row
-		x_vectors[0:6, i] = feature_dict[(x, y)] # hand feature encoding
-		x_vectors[6:8, i] = [x, y] # coordinate encoding
-	x_vectors[8:, 0:n_start] = np.array([[1], [0]])
-	x_vectors[8:, n_holds - n_end:] = np.array([[0], [1]])
-	return x_vectors
 
 def beta_to_x_vectors(beta: ph.beta):
 	"""

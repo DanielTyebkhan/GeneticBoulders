@@ -69,13 +69,16 @@ class MoonBoardRoute:
         return str(self.id)
 
     def num_holds(self):
-        return self.num_starting_holds + len(self.start_holds) + self.num_end_holds
+        return self.num_starting_holds() + self.num_mid_holds() + self.num_end_holds()
 
     def num_starting_holds(self):
         return len(self.start_holds)
 
     def num_end_holds(self):
         return len(self.end_holds)
+
+    def num_mid_holds(self):
+        return len(self.mid_holds)
 
     def get_all_holds(self) -> MoonBoardHolds:
         return self.start_holds + self.mid_holds + self.end_holds
