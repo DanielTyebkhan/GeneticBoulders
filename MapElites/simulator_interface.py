@@ -1,4 +1,4 @@
-import structs
+import share.structs as structs
 from dataclasses import dataclass
 
 @dataclass

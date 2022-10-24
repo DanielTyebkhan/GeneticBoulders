@@ -1,6 +1,6 @@
 import time
 import ribs
-import structs
+import share.structs as structs
 import simulator_interface
 
 # TODO: add seed

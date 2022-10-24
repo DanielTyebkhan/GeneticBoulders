@@ -2,11 +2,14 @@ import os
 import pathlib
 import pandas as pd
 import numpy as np
-from structs import MoonBoardRoute
+from share.structs import MoonBoardRoute
 import MoonBoardRNN.BetaMove.preprocessing_helper as ph
 
 
-def classify_and_reorganize_data_ga(route: MoonBoardRoute):
+def classify_and_reorganize_data_ga(route: MoonBoardRoute, feature_dict=None):
+	if feature_dict is None:
+		feature_dict = load_feature_dict()
+
 	n_start = route.num_starting_holds()
 	n_mid = route.num_mid_holds()
 	n_hold = route.num_holds()
@@ -16,7 +19,6 @@ def classify_and_reorganize_data_ga(route: MoonBoardRoute):
 	all_holds = start_sorted + mid_sorted + end_sorted
 
 	x_vectors = np.zeros((10, n_hold))
-	feature_dict = __load_feature_dict()
 	for i, hold in enumerate(all_holds):
 		x, y = hold.col, hold.row
 		x_vectors[0:6, i] = feature_dict[(x, y)] # hand feature encoding
@@ -36,7 +38,7 @@ def route_to_x_vectors(route: MoonBoardRoute):
 	x_vectors = beta_to_x_vectors(beta)
 	return x_vectors
 
-def __load_feature_dict():
+def load_feature_dict():
     dirname = pathlib.Path(__file__).parent
     file_path = os.path.join(dirname, 'HoldFeature2016.xlsx')
     features = pd.read_excel(file_path, dtype=str)

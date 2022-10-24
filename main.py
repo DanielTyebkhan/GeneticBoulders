@@ -1,4 +1,4 @@
-import structs
+import share.structs as structs
 import ribs_interface
 import constants
 
