@@ -1,7 +1,5 @@
-from concurrent.futures import process
 import os
 import pathlib
-import re
 import pandas as pd
 import numpy as np
 from structs import MoonBoardRoute
@@ -31,20 +29,8 @@ def produce_sequence(hold_vectors):
 	out = ph.produce_sequence(0, {0: hold_vectors}, 1)
 	return out[0]
 
-def generate_organized_sequence_data(hold_vectors):
-	beta = produce_sequence(hold_vectors)
-	moves_info = ph.moveGenerator(beta)
-	# TODO: double check that this is correct for encoding move difficulty
-	moves_success = [100] + [m['MoveSuccessRate'][0] for m in moves_info] + [100]
-	res = np.vstack([
-		hold_vectors[6:8, beta.handSequence],
-		(np.array(beta.handOperator) == 'LH')*(-1) + (np.array(beta.handOperator) == 'RH')*1,
-		moves_success])
-	return res
-
 def route_to_x_vectors(route: MoonBoardRoute):
 	route_id = route.get_id_str()
-	# data_dict = {route_id: route_to_hold_vectors(route)}
 	data_dict = {route_id: classify_and_reorganize_data_ga(route)}
 	beta = ph.produce_sequence(route_id, data_dict, printout=True)[0]
 	x_vectors = beta_to_x_vectors(beta)
