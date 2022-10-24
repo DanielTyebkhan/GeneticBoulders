@@ -1,7 +1,7 @@
 import random
 
 from share.structs import MoonBoardRoute
-from MapElites.me_structs import MEParams
+from MapElites.me_utils import MEParams
 import MapElites.ribs_interface as me
 
 def main():
