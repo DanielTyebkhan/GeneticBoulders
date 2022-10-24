@@ -61,7 +61,10 @@ class MoonBoardRoute:
     ROWS = 18
     MAX_START_ROW = 6
 
-    # coordinates not included in the hold sets
+    # TODO: double check this restriction
+    MAX_HOLDS = 12 # Neural Net Grader can handle at most 12 moves 
+
+    # coordinates not included in the 2016 hold sets
     INVALID_HOLDS = [
         'A17', 'B17', 'C17', 'E17', 'F17', 'H17', 'I17', 'J17', 'K17',
         'J15', 'K15', 'B14', 'A8', 'A7', 'A6', 'H6', 'B5', 'E5', 'G5', 
@@ -73,13 +76,11 @@ class MoonBoardRoute:
     end_holds: MoonBoardHolds
     id: UUID
 
-    def __init__(self, start_holds: MoonBoardHolds, mid_holds: MoonBoardHolds, end_holds: MoonBoardHolds, id: Optional[UUID] = None):
+    def __init__(self, *, start_holds: MoonBoardHolds, mid_holds: MoonBoardHolds, end_holds: MoonBoardHolds, id: Optional[UUID] = None):
         self.id = id or uuid1()
         self.start_holds = start_holds
         self.mid_holds = mid_holds
         self.end_holds = end_holds
-
-        assert self.is_valid()
 
     def from_hold_strings(start: List[str], mid: List[str], end: List[str]):
         start_holds = MoonBoardHold.from_string_list(start)
@@ -106,25 +107,45 @@ class MoonBoardRoute:
         return self.start_holds + self.mid_holds + self.end_holds
 
     def make_random():
-        # can randomize this later
+        # can randomize num start and end holds
         num_start = 1
         num_end = 1 
-        start_holds = []
+        num_mid = random.randint(2, MoonBoardRoute.MAX_HOLDS)
+        start_holds = [MoonBoardHold(MoonBoardRoute.rand_start_row(), MoonBoardRoute.rand_col()) for _ in range(num_start)]
+        end_holds = [MoonBoardHold(moonboard_row_to_index(MoonBoardRoute.ROWS), MoonBoardRoute.rand_col()) for _ in range(num_end)]
+        mid_holds = [MoonBoardHold(MoonBoardRoute.rand_row(), MoonBoardRoute.rand_col()) for _ in range(num_mid)]
+        return MoonBoardRoute(start_holds=start_holds, mid_holds=mid_holds, end_holds=end_holds)
+
+    def make_random_valid():
+        while not (route := MoonBoardRoute.make_random()).is_valid():
+            pass
+        return route
+
+    def rand_col():
+        return random.randint(0, MoonBoardRoute.COLUMNS)
+
+    def rand_row():
+        return random.randint(0, moonboard_row_to_index(MoonBoardRoute.ROWS))
+
+    def rand_start_row():
+        return random.randint(0, moonboard_row_to_index(MoonBoardRoute.MAX_START_ROW))
     
     def is_valid(self):
         """
         Sanity check that the route conforms to items:
         Restrictions:
             - problems all finish on the top row
-            - if there are two start/end holds, they must be reachable at the same time
             - all start holds must be on row 6 or lower
             - all holds are actually in the hold set
+            - there are no more than the max number of holds
+            - TODO: if there are two start/end holds, they must be reachable at the same time 
         """
         conditions = [
             1 <= self.num_starting_holds() <= 2,
             1 <= self.num_end_holds() <= 2,
             all([h.row == moonboard_row_to_index(MoonBoardRoute.ROWS) for h in self.end_holds]),
             all([h.row < MoonBoardRoute.MAX_START_ROW for h in self.start_holds]),
-            all([h not in MoonBoardRoute.INVALID_HOLDS for h in self.get_all_holds()])
+            all([h not in MoonBoardRoute.INVALID_HOLDS for h in self.get_all_holds()]),
+            self.num_holds() <= MoonBoardRoute.MAX_HOLDS
         ]
         return all(conditions)
