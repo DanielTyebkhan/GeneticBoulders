@@ -81,10 +81,10 @@ class MoonBoardRoute:
         self.mid_holds = mid_holds
         self.end_holds = end_holds
 
-    def from_hold_strings(start: List[str], mid: List[str], end: List[str]):
-        start_holds = MoonBoardHold.from_string_list(start)
-        mid_holds = MoonBoardHold.from_string_list(mid)
-        end_holds = MoonBoardHold.from_string_list(end)
+    def from_hold_strings(*, start_holds: List[str], mid_holds: List[str], end_holds: List[str]):
+        start_holds = MoonBoardHold.from_string_list(start_holds)
+        mid_holds = MoonBoardHold.from_string_list(mid_holds)
+        end_holds = MoonBoardHold.from_string_list(end_holds)
         return MoonBoardRoute(start_holds, mid_holds, end_holds)
 
     def get_id_str(self):
