@@ -6,16 +6,6 @@ from uuid import UUID, uuid1
 A_OFFSET = 65
 
 
-@dataclass 
-class MEParams:
-    grid_size: Tuple[int, int]
-    bounds: List[Tuple[int, int]]
-    batch_size: int
-    sigma_0: float
-    num_emitters: int
-    iterations: int
-
-
 def moonboard_row_to_index(row: int) -> int:
     return row - 1
 
@@ -149,3 +139,11 @@ class MoonBoardRoute:
             self.num_holds() <= MoonBoardRoute.MAX_HOLDS
         ]
         return all(conditions)
+
+    def get_hold_variety():
+        # TODO
+        return random.randint(1, 5)
+    
+    def get_hold_density():
+        # TODO
+        return random.uniform(0, 1)

@@ -1,16 +1,20 @@
 import time
 import ribs
-import share.structs as structs
-import simulator_interface
+from MoonBoardRNN.GradeNet.grade_net import GradeNet
+from share.structs import MoonBoardHolds, MoonBoardRoute
+from MapElites.me_structs import MEParams
 
-# TODO: add seed
-def run_mapelites(params: structs.MEParams, report_frequency: int=25):
-    sim_params = None
+def grade_string_to_num(grade: str) -> int:
+    return int(grade[1:])
+
+def run_mapelites(target_grade: str, params: MEParams, report_frequency: int=25):
+    target = grade_string_to_num(target_grade)
+    gradenet = GradeNet()
     archive = ribs.archives.GridArchive(params.grid_size, params.bounds)
     emitters = [
         ribs.emitters.ImprovementEmitter(
             archive, 
-            structs.MoonBoardRoute.randomize(),
+            MoonBoardRoute.make_random(),
             params.sigma_0,
             params.batch_size) for _ in range(params.num_emitters)
     ]
@@ -20,8 +24,11 @@ def run_mapelites(params: structs.MEParams, report_frequency: int=25):
         population = optimizer.ask()
         objc, bcs = [], []
         for individual in population:
-            work_done, hold_variety, hold_density = simulator_interface.run_simulation(individual, sim_params)
-            objc.append(work_done)
+            rating = gradenet.grade_route(individual)
+            hold_variety = individual.get_hold_variety()
+            hold_density = individual.get_hold_density()
+            fitness = abs(target - grade_string_to_num(rating))
+            objc.append(fitness)
             bcs.append([hold_variety, hold_density])
 
         optimizer.tell(objc, bcs)
@@ -31,6 +38,4 @@ def run_mapelites(params: structs.MEParams, report_frequency: int=25):
             print(f"> {itr} itrs completed after {elapsed_time:.2f} s")
             print(f"  - Archive Size: {len(archive)}")
             print(f"  - Max Score: {archive.stats.obj_max}")
-
-        
 
