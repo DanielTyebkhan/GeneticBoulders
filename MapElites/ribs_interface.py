@@ -1,7 +1,7 @@
 import time
 import ribs
 from MoonBoardRNN.GradeNet.grade_net import GradeNet
-from share.structs import MoonBoardHolds, MoonBoardRoute
+from share.moonboard_util import MoonBoardHolds, MoonBoardRoute
 from MapElites.me_utils import MEParams
 
 def grade_string_to_num(grade: str) -> int:

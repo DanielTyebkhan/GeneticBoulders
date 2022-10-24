@@ -54,6 +54,8 @@ class MoonBoardRoute:
     # TODO: double check this restriction
     MAX_HOLDS = 12 # Neural Net Grader can handle at most 12 moves 
 
+    __INDEX_MAP_1D = 
+
     # coordinates not included in the 2016 hold sets
     INVALID_HOLDS = [
         'A17', 'B17', 'C17', 'E17', 'F17', 'H17', 'I17', 'J17', 'K17',
@@ -147,3 +149,6 @@ class MoonBoardRoute:
     def get_hold_density():
         # TODO
         return random.uniform(0, 1)
+
+    def hold_to_valid_index(hold: MoonBoardHold):
+        valid_indices = 

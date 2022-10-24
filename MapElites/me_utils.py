@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import Tuple, List
 
+from share.moonboard_util import MoonBoardRoute
+
 @dataclass 
 class MEParams:
     grid_size: Tuple[int, int]
@@ -11,4 +13,6 @@ class MEParams:
     iterations: int
 
 
+def route_to_ME_params(route: MoonBoardRoute):
+    
 
