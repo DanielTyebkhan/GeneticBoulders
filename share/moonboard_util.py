@@ -85,7 +85,7 @@ class MoonBoardRoute:
         start_holds = MoonBoardHold.from_string_list(start_holds)
         mid_holds = MoonBoardHold.from_string_list(mid_holds)
         end_holds = MoonBoardHold.from_string_list(end_holds)
-        return MoonBoardRoute(start_holds, mid_holds, end_holds)
+        return MoonBoardRoute(start_holds=start_holds, mid_holds=mid_holds, end_holds=end_holds)
 
     def get_id_str(self):
         return str(self.id)
