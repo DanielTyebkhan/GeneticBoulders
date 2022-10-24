@@ -63,11 +63,12 @@ class MoonBoardRoute:
         'A4', 'C4', 'D4', 'F4', 'H4', 'J4', 'K4', 'A3', 'C3', 'K2'
     ] + hold_string_range(3, 'E', 'K') + hold_string_range(2, 'A', 'F') + hold_string_range(2, 'H', 'I') + hold_string_range(1, 'A', 'K')
 
-    __INDEX_MAP_1D = [
-        h for h in 
-            sum([[MoonBoardHold(row, col) for col in range(MoonBoardRoute.COLUMNS)] for row in range(ROWS)]) 
-        if h not in MoonBoardRoute.INVALID_HOLDS
-    ]
+    def INDEX_MAP_1D():
+        return [
+            h for h in 
+                sum([[MoonBoardHold(row, col) for col in range(MoonBoardRoute.COLUMNS)] for row in range(MoonBoardRoute.ROWS)], start=[]) 
+            if h not in MoonBoardRoute.INVALID_HOLDS
+        ]
 
     mid_holds: MoonBoardHolds
     start_holds: MoonBoardHolds
@@ -120,7 +121,7 @@ class MoonBoardRoute:
         return route
 
     def rand_col():
-        return random.randint(0, MoonBoardRoute.COLUMNS)
+        return random.randint(0, MoonBoardRoute.COLUMNS) - 1
 
     def rand_row():
         return random.randint(0, moonboard_row_to_index(MoonBoardRoute.ROWS))
@@ -156,5 +157,15 @@ class MoonBoardRoute:
         # TODO
         return random.uniform(0, 1)
 
-    def hold_to_valid_index(hold: MoonBoardHold):
-        valid_indices = 
+    def hold_to_valid_index(hold: MoonBoardHold) -> int:
+        return MoonBoardRoute.INDEX_MAP_1D().index(hold)
+
+    def holds_to_indices(holds: MoonBoardHolds) -> List[int]:
+        return [MoonBoardRoute.hold_to_valid_index(h) for h in holds]
+
+    def valid_index_to_hold(index: int) -> MoonBoardHold:
+        return MoonBoardRoute.INDEX_MAP_1D()[index]
+
+    def valid_indices_to_holds(indices: List[int]) -> MoonBoardHolds:
+        return [MoonBoardRoute.valid_index_to_hold(i) for i in indices]
+
