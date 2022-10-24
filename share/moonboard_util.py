@@ -121,7 +121,7 @@ class MoonBoardRoute:
         return route
 
     def rand_col():
-        return random.randint(0, MoonBoardRoute.COLUMNS) - 1
+        return random.randint(0, MoonBoardRoute.COLUMNS - 1)
 
     def rand_row():
         return random.randint(0, moonboard_row_to_index(MoonBoardRoute.ROWS))
