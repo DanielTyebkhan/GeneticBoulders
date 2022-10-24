@@ -2,7 +2,7 @@ import time
 import ribs
 from MoonBoardRNN.GradeNet.grade_net import GradeNet
 from share.moonboard_util import MoonBoardHolds, MoonBoardRoute
-from MapElites.me_utils import MEParams
+from MapElites.me_utils import MEParams, route_to_ME_params, ME_params_to_route
 
 def grade_string_to_num(grade: str) -> int:
     return int(grade[1:])
@@ -14,7 +14,7 @@ def run_mapelites(target_grade: str, params: MEParams, report_frequency: int=25)
     emitters = [
         ribs.emitters.ImprovementEmitter(
             archive, 
-            MoonBoardRoute.make_random(),
+            route_to_ME_params(MoonBoardRoute.make_random()),
             params.sigma_0,
             params.batch_size) for _ in range(params.num_emitters)
     ]
