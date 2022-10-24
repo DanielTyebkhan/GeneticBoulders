@@ -23,6 +23,8 @@ def hold_string_range(row: int, start_col: str, end_col: str):
     return holds
 
 
+
+
 @dataclass
 class MoonBoardHold:
     row: int
@@ -40,7 +42,6 @@ class MoonBoardHold:
 
 MoonBoardHolds = List[MoonBoardHold]
 
-
 @dataclass
 class MoonBoardRoute:
     """
@@ -54,7 +55,6 @@ class MoonBoardRoute:
     # TODO: double check this restriction
     MAX_HOLDS = 12 # Neural Net Grader can handle at most 12 moves 
 
-    __INDEX_MAP_1D = 
 
     # coordinates not included in the 2016 hold sets
     INVALID_HOLDS = [
@@ -62,6 +62,12 @@ class MoonBoardRoute:
         'J15', 'K15', 'B14', 'A8', 'A7', 'A6', 'H6', 'B5', 'E5', 'G5', 
         'A4', 'C4', 'D4', 'F4', 'H4', 'J4', 'K4', 'A3', 'C3', 'K2'
     ] + hold_string_range(3, 'E', 'K') + hold_string_range(2, 'A', 'F') + hold_string_range(2, 'H', 'I') + hold_string_range(1, 'A', 'K')
+
+    __INDEX_MAP_1D = [
+        h for h in 
+            sum([[MoonBoardHold(row, col) for col in range(MoonBoardRoute.COLUMNS)] for row in range(ROWS)]) 
+        if h not in MoonBoardRoute.INVALID_HOLDS
+    ]
 
     mid_holds: MoonBoardHolds
     start_holds: MoonBoardHolds
