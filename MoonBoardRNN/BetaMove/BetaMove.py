@@ -34,7 +34,7 @@ def produce_sequence(hold_vectors):
 def route_to_x_vectors(route: MoonBoardRoute):
 	route_id = route.get_id_str()
 	data_dict = {route_id: classify_and_reorganize_data_ga(route)}
-	beta = ph.produce_sequence(route_id, data_dict, printout=True)[0]
+	beta = ph.produce_sequence(route_id, data_dict, printout=False)[0]
 	x_vectors = beta_to_x_vectors(beta)
 	return x_vectors
 
