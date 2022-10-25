@@ -4,8 +4,10 @@ from MoonBoardRNN.GradeNet.grade_net import GradeNet
 from share.moonboard_util import MoonBoardRoute
 from MapElites.me_utils import MEParams, get_me_params_bounds, route_to_ME_params, ME_params_to_route
 
+
 def grade_string_to_num(grade: str) -> int:
     return int(grade[1:])
+
 
 def run_mapelites(target_grade: str, params: MEParams, report_frequency: int=25):
     target = grade_string_to_num(target_grade)
@@ -28,7 +30,7 @@ def run_mapelites(target_grade: str, params: MEParams, report_frequency: int=25)
         objc, bcs = [], []
         for individual in population:
             route = ME_params_to_route(individual)
-            rating = gradenet.grade_route(route)
+            rating = 'V10000000' if not route.is_valid() else gradenet.grade_route(route)
             hold_variety = route.get_hold_variety()
             hold_density = route.get_hold_density()
             fitness = abs(target - grade_string_to_num(rating))
