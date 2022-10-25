@@ -37,7 +37,7 @@ class MoonBoardHold:
         return [MoonBoardHold.from_string(s) for s in strlist]
 
     def to_coordinate_string(self) -> str:
-        return chr(A_OFFSET + self.row) + str(self.col)
+        return chr(A_OFFSET + self.col) + str(self.row + 1)
 
     def is_valid(self) -> bool:
         return (self.col, self.row) in valid_holds.ALL_HOLDS
@@ -77,7 +77,7 @@ class MoonBoardRoute:
     MAX_START_HOLDS = 1
     MIN_END_HOLDS = 1
     MAX_END_HOLDS = 1
-    MIN_MID_HOLDS = 1
+    MIN_MID_HOLDS = 4
     MAX_MID_HOLDS = 7
 
     # TODO: double check this restriction

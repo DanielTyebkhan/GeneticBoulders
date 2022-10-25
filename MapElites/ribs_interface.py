@@ -55,6 +55,9 @@ def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report
             fitness = eval_fitness(route, target, gradenet)
             hold_variety = route.get_hold_variety()
             hold_density = route.get_hold_density()
+            if hold_variety in [1, 4] and (hold_density < 0.4 or hold_density > 0.8):
+                hold_density = 0.5
+                hold_density = 3
             objc.append(fitness)
             bcs.append([hold_density, hold_variety])
 
@@ -76,7 +79,7 @@ def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report
 
 def viz_archive(archive, output_dir):
     plot_archive_heatmap(archive, os.path.join(output_dir, 'archive.png'))
-    draw_archive_on_board(archive, os.path.join(output_dir, 'board_images'))
+    # draw_archive_on_board(archive, os.path.join(output_dir, 'board_images'))
 
 def plot_archive_heatmap(archive, save_path):
     plt.ylabel('Hold Diversity')

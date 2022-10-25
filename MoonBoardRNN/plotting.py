@@ -1,8 +1,16 @@
+import pathlib
+import os
 import matplotlib.pyplot as plt
-import cbook
+from matplotlib import cbook
 import re
+
+def plot_route(route):
+    plot_problem(route.to_strings())
+
 def plot_problem(stringList, title = None, key = None, save = None):    
-    image_file = cbook.get_sample_data("moonboard2016Background.jpg")
+    p_dir = pathlib.Path(__file__).parent
+    image_path = os.path.join(p_dir, 'moonboard2016Background.jpg')
+    image_file = cbook.get_sample_data(image_path)
     plt.rcParams["figure.figsize"] = (30,10)
     img = plt.imread(image_file)
     x = []

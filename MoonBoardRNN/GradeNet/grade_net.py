@@ -64,5 +64,5 @@ class GradeNet:
 		matrix = x_vectors_to_matrix(x_vectors)
 		# TODO: NORMALIZE THE MATRIX
 		container = np.array([matrix])
-		pred = self.__model.predict(container).argmax(axis = 1)
+		pred = self.__model.predict(container, verbose=0).argmax(axis = 1)
 		return convert_num_to_V_grade(pred[0])
