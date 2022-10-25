@@ -3,3 +3,4 @@ venv/
 **.pyc
 DiscoveringClimbingMoves/.vs/*
 DiscoveringClimbingMoves/DiscoveringClimbingMovements/Release/*
+results/
