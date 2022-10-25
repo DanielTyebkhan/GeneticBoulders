@@ -18,11 +18,12 @@ def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report
     gradenet = GradeNet()
     archive = ribs.archives.GridArchive(params.grid_size, params.bounds)
     input_bounds = get_me_params_bounds()
-    x0s = [MoonBoardRoute.make_random_valid()] * params.num_emitters
+    initial_routes = [MoonBoardRoute.make_random_valid()] * params.num_emitters
+    x0s = [route_to_ME_params(r) for r in initial_routes]
     emitters = [
         ribs.emitters.ImprovementEmitter(
             archive=archive, 
-            x0=route_to_ME_params(x0s[i]),
+            x0=x0s[i],
             sigma0=params.sigma_0,
             batch_size=params.batch_size,
             bounds=input_bounds
@@ -30,8 +31,10 @@ def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report
     ]
     optimizer = ribs.optimizers.Optimizer(archive, emitters)
     start_time = time.time()
-    for itr in range(1, params.iterations):
+    for itr in range(1, params.iterations + 1):
+        print(f'Starting ask at {time.time()}')
         population = optimizer.ask()
+        print(f'Finished ask at {time.time()}')
         objc, bcs = [], []
         for individual in population:
             route = ME_params_to_route(individual)

@@ -56,6 +56,7 @@ class MoonBoardRoute:
     MAX_START_HOLDS = 1
     MIN_END_HOLDS = 1
     MAX_END_HOLDS = 1
+    MAX_MID_HOLDS = 7
 
     # TODO: double check this restriction
     MAX_HOLDS = 12 # Neural Net Grader can handle at most 12 moves 

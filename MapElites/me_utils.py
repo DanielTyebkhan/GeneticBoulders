@@ -29,13 +29,23 @@ def continuous_to_discrete_vals(vals: List[float]):
 
 def route_to_ME_params(route: MoonBoardRoute):
     """
+    format: [
+        start_hold, end_hold, num_mid, ...mid_holds
+    ]
+    """
+    start = MoonBoardRoute.hold_to_valid_index(route.start_holds[0])
+    end = MoonBoardRoute.hold_to_valid_index(route.end_holds[0])
+    n_mid = route.num_mid_holds()
+    return [start, end, n_mid] + MoonBoardRoute.holds_to_indices(route.mid_holds) + [-1] * (MoonBoardRoute.MAX_MID_HOLDS - n_mid)
+    """
+    OLD: VERSION TODO: REVISIT
     Format:
     [
         num_start, start_index_1, start_index_2, 
         num_end, end_index_1, end_index_2,
         num_mid, mid_index_1..mid_index_max
     ]
-    """
+    
     nstart = route.num_starting_holds()
     nend = route.num_end_holds()
     arr = []
@@ -51,9 +61,17 @@ def route_to_ME_params(route: MoonBoardRoute):
     arr += MoonBoardRoute.holds_to_indices(route.mid_holds)
     arr += [-1 for i in range(MoonBoardRoute.MAX_HOLDS - route.num_holds())]
     return arr
+    """
     
 
 def ME_params_to_route(params: List[int]) -> MoonBoardRoute:
+    start = MoonBoardRoute.valid_index_to_hold(params[0])
+    end = MoonBoardRoute.valid_index_to_hold(params[1])
+    n_mid = params[2]
+    mid = MoonBoardRoute.valid_indices_to_holds(params[3: n_mid + 3])
+    return MoonBoardRoute(start_holds=start, end_holds=end, mid_holds=mid)
+    """
+    OLD
     si = ROUTE_START_COUNT_I
     ei = ROUTE_END_COUNT_I
     mi = ROUTE_MID_COUNT_I
@@ -64,6 +82,7 @@ def ME_params_to_route(params: List[int]) -> MoonBoardRoute:
     mid_holds = MoonBoardRoute.valid_indices_to_holds(continuous_to_discrete_vals(params[mi + 1: mi + n_mid + 1]))
     end_holds = MoonBoardRoute.valid_indices_to_holds(continuous_to_discrete_vals(params[ei + 1: ei + n_end + 1]))
     return MoonBoardRoute(start_holds=start_holds, mid_holds=mid_holds, end_holds=end_holds)
+    """
 
 
 def get_me_params_bounds():
