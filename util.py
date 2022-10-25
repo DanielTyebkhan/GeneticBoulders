@@ -1,3 +1,4 @@
+import pickle
 import math
 from typing import List, Callable
 
@@ -21,3 +22,13 @@ def min_index_with_cond(ls: List, cond: Callable[[any], bool]) -> int:
         index += 1
     return index
     
+
+def save_pickle(obj, path):
+    with open(path, 'wb') as f:
+        pickle.dump(obj)
+
+
+def load_pickle(path):
+    with open(path, 'rb') as f:
+        obj = pickle.load(f)
+    return obj

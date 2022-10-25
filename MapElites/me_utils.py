@@ -69,8 +69,8 @@ def ME_params_to_route(params: List[int]) -> MoonBoardRoute:
 def get_me_params_bounds():
     max_start_holds = MoonBoardRoute.MAX_START_HOLDS
     max_end_holds = MoonBoardRoute.MAX_END_HOLDS
-    start_range = (-1, 0) # TODO
-    end_range = (-1, -1) # TODO
+    start_range = (MoonBoardRoute.min_start_index() - 1, MoonBoardRoute.max_start_index()) # TODO
+    end_range = (MoonBoardRoute.min_end_index() - 1, MoonBoardRoute.max_end_index()) # TODO
     mid_range = (-1, len(MoonBoardRoute.index_map_1d()) - 1)
     max_mid_holds = MoonBoardRoute.MAX_HOLDS - (max_start_holds + max_end_holds)
 
