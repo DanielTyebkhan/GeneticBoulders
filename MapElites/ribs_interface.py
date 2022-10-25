@@ -13,14 +13,19 @@ def grade_string_to_num(grade: str) -> int:
     return int(grade[1:])
 
 
-def eval_fitness(route: MoonBoardRoute, gradenet: GradeNet):
+def eval_fitness(route: MoonBoardRoute, target_grade: int, gradenet: GradeNet):
     # TODO: figure out why we sometimes get a key error
     try:
         if route.is_valid():
-            return gradenet.grade_route(route)
+            grade = gradenet.grade_route(route)
+            num_grade = grade_string_to_num(grade)
+            diff = abs(target_grade - num_grade)
+            if diff == 0:
+                return 1
+            return 1/diff
     except Exception as ex:
         pass
-    return 'V10000000'
+    return 0
 
 
 def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report_frequency: int=25):
@@ -36,22 +41,20 @@ def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report
             x0=x0s[i],
             sigma0=params.sigma_0,
             batch_size=params.batch_size,
-            bounds=input_bounds
+            bounds=input_bounds,
+            restart_rule='basic'
         ) for i in range(params.num_emitters)
     ]
     optimizer = ribs.optimizers.Optimizer(archive, emitters)
     start_time = time.time()
     for itr in range(1, params.iterations + 1):
-        print(f'Starting ask at {time.time()}')
         population = optimizer.ask()
-        print(f'Finished ask at {time.time()}')
         objc, bcs = [], []
         for individual in population:
             route = ME_params_to_route(individual)
-            rating = eval_fitness(route, gradenet)
+            fitness = eval_fitness(route, target, gradenet)
             hold_variety = route.get_hold_variety()
             hold_density = route.get_hold_density()
-            fitness = abs(target - grade_string_to_num(rating))
             objc.append(fitness)
             bcs.append([hold_variety, hold_density])
 

@@ -2,6 +2,7 @@ import random
 from typing import List, Optional, Tuple
 from dataclasses import dataclass
 from uuid import UUID, uuid1
+from share import valid_holds
 import util
 
 A_OFFSET = 65
@@ -38,6 +39,26 @@ class MoonBoardHold:
     def to_coordinate_string(self) -> str:
         return chr(A_OFFSET + self.row) + str(self.col)
 
+    def is_valid(self) -> bool:
+        return (self.col, self.row) in valid_holds.ALL_HOLDS
+
+    def from_xy(x, y):
+        return MoonBoardHold(row=y, col=x)
+
+    def __rand_from_list(ls):
+        x, y = random.choice(ls)
+        return MoonBoardHold.from_xy(x, y)
+
+    def make_random():
+        return MoonBoardHold.__rand_from_list(valid_holds.ALL_HOLDS)
+
+    def make_random_start():
+        return MoonBoardHold.__rand_from_list(valid_holds.START_HOLDS)
+
+    def make_random_end():
+        return MoonBoardHold.__rand_from_list(valid_holds.END_HOLDS)
+
+
 
 MoonBoardHolds = List[MoonBoardHold]
 
@@ -56,6 +77,7 @@ class MoonBoardRoute:
     MAX_START_HOLDS = 1
     MIN_END_HOLDS = 1
     MAX_END_HOLDS = 1
+    MIN_MID_HOLDS = 1
     MAX_MID_HOLDS = 7
 
     # TODO: double check this restriction
@@ -132,10 +154,10 @@ class MoonBoardRoute:
         # can randomize num start and end holds
         num_start = 1
         num_end = 1 
-        num_mid = random.randint(2, MoonBoardRoute.MAX_HOLDS)
-        start_holds = [MoonBoardHold(MoonBoardRoute.rand_start_row(), MoonBoardRoute.rand_col()) for _ in range(num_start)]
-        end_holds = [MoonBoardHold(moonboard_row_to_index(MoonBoardRoute.ROWS), MoonBoardRoute.rand_col()) for _ in range(num_end)]
-        mid_holds = [MoonBoardHold(MoonBoardRoute.rand_row(), MoonBoardRoute.rand_col()) for _ in range(num_mid)]
+        num_mid = random.randint(MoonBoardRoute.MIN_MID_HOLDS, MoonBoardRoute.MAX_MID_HOLDS)
+        start_holds = [MoonBoardHold.make_random_start() for _ in range(num_start)]
+        end_holds = [MoonBoardHold.make_random_end() for _ in range(num_end)]
+        mid_holds = [MoonBoardHold.make_random() for _ in range(num_mid)]
         return MoonBoardRoute(start_holds=start_holds, mid_holds=mid_holds, end_holds=end_holds)
 
     def make_random_valid():
