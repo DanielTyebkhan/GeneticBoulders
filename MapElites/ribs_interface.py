@@ -1,8 +1,8 @@
 import time
 import ribs
 from MoonBoardRNN.GradeNet.grade_net import GradeNet
-from share.moonboard_util import MoonBoardHolds, MoonBoardRoute
-from MapElites.me_utils import MEParams, route_to_ME_params, ME_params_to_route
+from share.moonboard_util import MoonBoardRoute
+from MapElites.me_utils import MEParams, get_me_params_bounds, route_to_ME_params, ME_params_to_route
 
 def grade_string_to_num(grade: str) -> int:
     return int(grade[1:])
@@ -11,12 +11,15 @@ def run_mapelites(target_grade: str, params: MEParams, report_frequency: int=25)
     target = grade_string_to_num(target_grade)
     gradenet = GradeNet()
     archive = ribs.archives.GridArchive(params.grid_size, params.bounds)
+    input_bounds = get_me_params_bounds()
     emitters = [
         ribs.emitters.ImprovementEmitter(
             archive, 
-            route_to_ME_params(MoonBoardRoute.make_random()),
+            route_to_ME_params(MoonBoardRoute.make_random_valid()),
             params.sigma_0,
-            params.batch_size) for _ in range(params.num_emitters)
+            params.batch_size,
+            bounds=input_bounds
+        ) for _ in range(params.num_emitters)
     ]
     optimizer = ribs.optimizers.Optimizer(archive, emitters)
     start_time = time.time()
@@ -24,9 +27,10 @@ def run_mapelites(target_grade: str, params: MEParams, report_frequency: int=25)
         population = optimizer.ask()
         objc, bcs = [], []
         for individual in population:
-            rating = gradenet.grade_route(individual)
-            hold_variety = individual.get_hold_variety()
-            hold_density = individual.get_hold_density()
+            route = ME_params_to_route(individual)
+            rating = gradenet.grade_route(route)
+            hold_variety = route.get_hold_variety()
+            hold_density = route.get_hold_density()
             fitness = abs(target - grade_string_to_num(rating))
             objc.append(fitness)
             bcs.append([hold_variety, hold_density])

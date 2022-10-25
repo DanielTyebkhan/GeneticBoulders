@@ -55,3 +55,27 @@ def ME_params_to_route(params: List[int]) -> MoonBoardRoute:
     mid_holds = MoonBoardRoute.valid_indices_to_holds(params[mi + 1: mi + n_mid + 1])
     end_holds = MoonBoardRoute.valid_indices_to_holds(params[ei + 1: ei + n_end + 1])
     return MoonBoardRoute(start_holds=start_holds, mid_holds=mid_holds, end_holds=end_holds)
+
+
+def get_me_params_bounds():
+    max_start_holds = MoonBoardRoute.MAX_START_HOLDS
+    max_end_holds = MoonBoardRoute.MAX_END_HOLDS
+    start_range = (-1, 0) # TODO
+    end_range = (-1, -1) # TODO
+    mid_range = (-1, len(MoonBoardRoute.index_map_1d()) - 1)
+    max_mid_holds = (-1, MoonBoardRoute.MAX_HOLDS - (max_start_holds + max_end_holds))
+
+    return [
+        (MoonBoardRoute.MIN_START_HOLDS - 1, max_start_holds), # number of start holds
+        start_range, # start hold 1 need to figure out max possible index
+        start_range, # start hold 2
+        (MoonBoardRoute.MIN_END_HOLDS - 1, max_end_holds), # number of end holds
+        end_range, # end hold 1 need to figure out index range
+        end_range, # end hold 2
+        (-1, max_mid_holds)
+    ] + [mid_range] * max_mid_holds
+
+
+def continuous_to_discrete(cont_val: float, discrete_min, discrete_max):
+    diff = discrete_max - discrete_min
+    

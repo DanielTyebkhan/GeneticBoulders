@@ -59,7 +59,7 @@ class GradeNet:
 	def load_pretrained_weights(self, weights_path):
 		self.__model.load_weights(weights_path)
 
-	def grade_route(self, route: MoonBoardRoute) -> int:
+	def grade_route(self, route: MoonBoardRoute) -> str:
 		x_vectors = route_to_x_vectors(route)
 		matrix = x_vectors_to_matrix(x_vectors)
 		# TODO: NORMALIZE THE MATRIX

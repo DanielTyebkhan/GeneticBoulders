@@ -23,8 +23,6 @@ def hold_string_range(row: int, start_col: str, end_col: str):
     return holds
 
 
-
-
 @dataclass
 class MoonBoardHold:
     row: int
@@ -50,11 +48,16 @@ class MoonBoardRoute:
     """
     COLUMNS = 11
     ROWS = 18
-    MAX_START_ROW = 6
+    MAX_START_ROW = 5 # 0 based indexing
+    
+    # TODO: increase maxes to 2
+    MIN_START_HOLDS = 1
+    MAX_START_HOLDS = 1
+    MIN_END_HOLDS = 1
+    MAX_END_HOLDS = 1
 
     # TODO: double check this restriction
     MAX_HOLDS = 12 # Neural Net Grader can handle at most 12 moves 
-
 
     # coordinates not included in the 2016 hold sets
     INVALID_HOLDS = [
@@ -63,12 +66,26 @@ class MoonBoardRoute:
         'A4', 'C4', 'D4', 'F4', 'H4', 'J4', 'K4', 'A3', 'C3', 'K2'
     ] + hold_string_range(3, 'E', 'K') + hold_string_range(2, 'A', 'F') + hold_string_range(2, 'H', 'I') + hold_string_range(1, 'A', 'K')
 
-    def INDEX_MAP_1D():
+    def index_map_1d():
         return [
             h for h in 
                 sum([[MoonBoardHold(row, col) for col in range(MoonBoardRoute.COLUMNS)] for row in range(MoonBoardRoute.ROWS)], start=[]) 
             if h not in MoonBoardRoute.INVALID_HOLDS
         ]
+
+    def min_start_index():
+        return 0
+
+    def max_start_index():
+        imap = MoonBoardRoute.index_map_1d()
+        imap.index()
+
+    def min_end_index():
+        pass
+
+    def max_end_index():
+        pass
+
 
     mid_holds: MoonBoardHolds
     start_holds: MoonBoardHolds
@@ -76,6 +93,7 @@ class MoonBoardRoute:
     id: UUID
 
     def __init__(self, *, start_holds: MoonBoardHolds, mid_holds: MoonBoardHolds, end_holds: MoonBoardHolds, id: Optional[UUID] = None):
+        # TODO: deduplicate and copy holds rather than assigning arrays directly
         self.id = id or uuid1()
         self.start_holds = start_holds
         self.mid_holds = mid_holds
@@ -105,6 +123,10 @@ class MoonBoardRoute:
     def get_all_holds(self) -> MoonBoardHolds:
         return self.start_holds + self.mid_holds + self.end_holds
 
+    def to_strings(self):
+        holds = self.get_all_holds()
+        return [h.to_coordinate_string() for h in holds]
+
     def make_random():
         # can randomize num start and end holds
         num_start = 1
@@ -127,7 +149,7 @@ class MoonBoardRoute:
         return random.randint(0, moonboard_row_to_index(MoonBoardRoute.ROWS))
 
     def rand_start_row():
-        return random.randint(0, moonboard_row_to_index(MoonBoardRoute.MAX_START_ROW))
+        return random.randint(0, MoonBoardRoute.MAX_START_ROW)
     
     def is_valid(self):
         """
@@ -138,12 +160,13 @@ class MoonBoardRoute:
             - all holds are actually in the hold set
             - there are no more than the max number of holds
             - TODO: if there are two start/end holds, they must be reachable at the same time 
+            - TODO: lowest start hold should be lowest hold
         """
         conditions = [
-            1 <= self.num_starting_holds() <= 2,
-            1 <= self.num_end_holds() <= 2,
+            MoonBoardRoute.MIN_START_HOLDS <= self.num_starting_holds() <= MoonBoardRoute.MAX_START_HOLDS,
+            MoonBoardRoute.MIN_END_HOLDS <= self.num_end_holds() <= MoonBoardRoute.MAX_END_HOLDS,
             all([h.row == moonboard_row_to_index(MoonBoardRoute.ROWS) for h in self.end_holds]),
-            all([h.row < MoonBoardRoute.MAX_START_ROW for h in self.start_holds]),
+            all([h.row <= MoonBoardRoute.MAX_START_ROW for h in self.start_holds]),
             all([h not in MoonBoardRoute.INVALID_HOLDS for h in self.get_all_holds()]),
             self.num_holds() <= MoonBoardRoute.MAX_HOLDS
         ]
@@ -158,13 +181,13 @@ class MoonBoardRoute:
         return random.uniform(0, 1)
 
     def hold_to_valid_index(hold: MoonBoardHold) -> int:
-        return MoonBoardRoute.INDEX_MAP_1D().index(hold)
+        return MoonBoardRoute.index_map_1d().index(hold)
 
     def holds_to_indices(holds: MoonBoardHolds) -> List[int]:
         return [MoonBoardRoute.hold_to_valid_index(h) for h in holds]
 
     def valid_index_to_hold(index: int) -> MoonBoardHold:
-        return MoonBoardRoute.INDEX_MAP_1D()[index]
+        return MoonBoardRoute.index_map_1d()[index]
 
     def valid_indices_to_holds(indices: List[int]) -> MoonBoardHolds:
         return [MoonBoardRoute.valid_index_to_hold(i) for i in indices]
