@@ -56,7 +56,7 @@ def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report
             hold_variety = route.get_hold_variety()
             hold_density = route.get_hold_density()
             objc.append(fitness)
-            bcs.append([hold_variety, hold_density])
+            bcs.append([hold_density, hold_variety])
 
         optimizer.tell(objc, bcs)
 
@@ -70,10 +70,24 @@ def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report
     os.makedirs(output_dir, exist_ok=True)
     pickle_path = os.path.join(output_dir, 'archive.p')
     util.save_pickle(archive, pickle_path)
-    plot_path = os.path.join(output_dir, 'archive.png')
-    ribs.visualize.grid_archive_heatmap(archive)
-    plt.show()
-    plt.savefig(plot_path)
+    viz_archive(archive, output_dir)
 
+
+
+def viz_archive(archive, output_dir):
+    plot_archive_heatmap(archive, os.path.join(output_dir, 'archive.png'))
+    draw_archive_on_board(archive, os.path.join(output_dir, 'board_images'))
+
+def plot_archive_heatmap(archive, save_path):
+    plt.ylabel('Hold Diversity')
+    plt.xlabel('Hold Density')
+    ribs.visualize.grid_archive_heatmap(archive)
+    plt.savefig(save_path)
+    plt.show()
+
+def draw_archive_on_board(archive: ribs.archives.GridArchive, save_path):
+    for elite in archive:
+        print(elite)
+    
 
 
