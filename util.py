@@ -25,7 +25,7 @@ def min_index_with_cond(ls: List, cond: Callable[[any], bool]) -> int:
 
 def save_pickle(obj, path):
     with open(path, 'wb') as f:
-        pickle.dump(obj)
+        pickle.dump(obj, f)
 
 
 def load_pickle(path):
