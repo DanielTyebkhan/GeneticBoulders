@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import math
 from typing import Tuple, List
 
 from share.moonboard_util import MoonBoardRoute
@@ -17,6 +18,14 @@ ROUTE_START_COUNT_I = 0
 ROUTE_END_COUNT_I = 3
 ROUTE_MID_COUNT_I = 6
 
+
+def continuous_to_discrete(cont_val: float):
+    return math.ceil(cont_val)
+
+
+def continuous_to_discrete_vals(vals: List[float]):
+    return [continuous_to_discrete(v) for v in vals]
+    
 
 def route_to_ME_params(route: MoonBoardRoute):
     """
@@ -51,9 +60,9 @@ def ME_params_to_route(params: List[int]) -> MoonBoardRoute:
     n_start = params[si]
     n_end = params[ei]
     n_mid = params[mi]
-    start_holds = MoonBoardRoute.valid_indices_to_holds(params[si + 1: si + n_start + 1])
-    mid_holds = MoonBoardRoute.valid_indices_to_holds(params[mi + 1: mi + n_mid + 1])
-    end_holds = MoonBoardRoute.valid_indices_to_holds(params[ei + 1: ei + n_end + 1])
+    start_holds = MoonBoardRoute.valid_indices_to_holds(continuous_to_discrete_vals(params[si + 1: si + n_start + 1]))
+    mid_holds = MoonBoardRoute.valid_indices_to_holds(continuous_to_discrete_vals(params[mi + 1: mi + n_mid + 1]))
+    end_holds = MoonBoardRoute.valid_indices_to_holds(continuous_to_discrete_vals(params[ei + 1: ei + n_end + 1]))
     return MoonBoardRoute(start_holds=start_holds, mid_holds=mid_holds, end_holds=end_holds)
 
 
@@ -63,7 +72,7 @@ def get_me_params_bounds():
     start_range = (-1, 0) # TODO
     end_range = (-1, -1) # TODO
     mid_range = (-1, len(MoonBoardRoute.index_map_1d()) - 1)
-    max_mid_holds = (-1, MoonBoardRoute.MAX_HOLDS - (max_start_holds + max_end_holds))
+    max_mid_holds = MoonBoardRoute.MAX_HOLDS - (max_start_holds + max_end_holds)
 
     return [
         (MoonBoardRoute.MIN_START_HOLDS - 1, max_start_holds), # number of start holds
@@ -76,6 +85,4 @@ def get_me_params_bounds():
     ] + [mid_range] * max_mid_holds
 
 
-def continuous_to_discrete(cont_val: float, discrete_min, discrete_max):
-    diff = discrete_max - discrete_min
     

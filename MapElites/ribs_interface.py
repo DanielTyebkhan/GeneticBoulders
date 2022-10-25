@@ -16,10 +16,10 @@ def run_mapelites(target_grade: str, params: MEParams, report_frequency: int=25)
     input_bounds = get_me_params_bounds()
     emitters = [
         ribs.emitters.ImprovementEmitter(
-            archive, 
-            route_to_ME_params(MoonBoardRoute.make_random_valid()),
-            params.sigma_0,
-            params.batch_size,
+            archive=archive, 
+            x0=route_to_ME_params(MoonBoardRoute.make_random_valid()),
+            sigma0=params.sigma_0,
+            batch_size=params.batch_size,
             bounds=input_bounds
         ) for _ in range(params.num_emitters)
     ]
