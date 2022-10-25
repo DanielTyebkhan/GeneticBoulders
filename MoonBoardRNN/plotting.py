@@ -7,7 +7,7 @@ import re
 def plot_route(route):
     plot_problem(route.to_strings())
 
-def plot_problem(stringList, title = None, key = None, save = None):    
+def plot_problem(stringList, start_num = 1, title = None, key = None, save = None):    
     p_dir = pathlib.Path(__file__).parent
     image_path = os.path.join(p_dir, 'moonboard2016Background.jpg')
     image_file = cbook.get_sample_data(image_path)
@@ -39,7 +39,7 @@ def plot_problem(stringList, title = None, key = None, save = None):
     for xx,yy in zip(x,y):
         if yy == 84:
             circ = plt.Circle((xx,yy), 30, color = 'r', fill=False, linewidth = 2)
-        elif count < 2:
+        elif count < start_num:
             circ = plt.Circle((xx,yy), 30, color = 'g', fill=False, linewidth = 2)
         else:
             circ = plt.Circle((xx,yy), 30, color = 'b', fill=False, linewidth = 2)
