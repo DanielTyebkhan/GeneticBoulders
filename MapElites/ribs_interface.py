@@ -13,6 +13,16 @@ def grade_string_to_num(grade: str) -> int:
     return int(grade[1:])
 
 
+def eval_fitness(route: MoonBoardRoute, gradenet: GradeNet):
+    # TODO: figure out why we sometimes get a key error
+    try:
+        if route.is_valid():
+            return gradenet.grade_route(route)
+    except Exception as ex:
+        pass
+    return 'V10000000'
+
+
 def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report_frequency: int=25):
     target = grade_string_to_num(target_grade)
     gradenet = GradeNet()
@@ -38,7 +48,7 @@ def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report
         objc, bcs = [], []
         for individual in population:
             route = ME_params_to_route(individual)
-            rating = 'V10000000' if not route.is_valid() else gradenet.grade_route(route)
+            rating = eval_fitness(route, gradenet)
             hold_variety = route.get_hold_variety()
             hold_density = route.get_hold_density()
             fitness = abs(target - grade_string_to_num(rating))

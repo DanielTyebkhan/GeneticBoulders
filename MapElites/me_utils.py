@@ -64,12 +64,13 @@ def route_to_ME_params(route: MoonBoardRoute):
     """
     
 
-def ME_params_to_route(params: List[int]) -> MoonBoardRoute:
+def ME_params_to_route(in_params: List[int]) -> MoonBoardRoute:
+    params = continuous_to_discrete_vals(in_params)
     start = MoonBoardRoute.valid_index_to_hold(params[0])
     end = MoonBoardRoute.valid_index_to_hold(params[1])
     n_mid = params[2]
     mid = MoonBoardRoute.valid_indices_to_holds(params[3: n_mid + 3])
-    return MoonBoardRoute(start_holds=start, end_holds=end, mid_holds=mid)
+    return MoonBoardRoute(start_holds=[start], end_holds=[end], mid_holds=mid)
     """
     OLD
     si = ROUTE_START_COUNT_I

@@ -172,11 +172,11 @@ class MoonBoardRoute:
         ]
         return all(conditions)
 
-    def get_hold_variety():
+    def get_hold_variety(self):
         # TODO
         return random.randint(1, 5)
     
-    def get_hold_density():
+    def get_hold_density(self):
         # TODO
         return random.uniform(0, 1)
 
