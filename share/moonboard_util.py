@@ -2,6 +2,7 @@ import random
 from typing import List, Optional, Tuple
 from dataclasses import dataclass
 from uuid import UUID, uuid1
+import util
 
 A_OFFSET = 65
 
@@ -77,14 +78,13 @@ class MoonBoardRoute:
         return 0
 
     def max_start_index():
-        imap = MoonBoardRoute.index_map_1d()
-        imap.index()
+        return util.max_index_with_cond(MoonBoardRoute.index_map_1d(), lambda h: h.row <= MoonBoardRoute.MAX_START_ROW)
 
     def min_end_index():
-        pass
+        return util.min_index_with_cond(MoonBoardRoute.index_map_1d(), lambda h: h.row == MoonBoardRoute.ROWS - 1)
 
     def max_end_index():
-        pass
+        return len(MoonBoardRoute.index_map_1d()) - 1
 
 
     mid_holds: MoonBoardHolds
@@ -153,9 +153,8 @@ class MoonBoardRoute:
     
     def is_valid(self):
         """
-        Sanity check that the route conforms to items:
-        Restrictions:
-            - problems all finish on the top row
+        Check that the route conforms to restrictions:
+            - problems finish on the top row
             - all start holds must be on row 6 or lower
             - all holds are actually in the hold set
             - there are no more than the max number of holds
