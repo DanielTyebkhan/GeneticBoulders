@@ -1,6 +1,10 @@
 import pickle
 import math
-from typing import List, Callable
+from typing import Iterable, List, Callable
+
+
+def euclid_distance(p1: Iterable, p2: Iterable):
+    return math.sqrt(sum([(c1 - c2)**2 for c1, c2 in zip(p1, p2)]))
 
 
 def max_index_with_cond(ls: List, cond: Callable[[any], bool]) -> int:
