@@ -2,7 +2,7 @@ import os
 import pathlib
 import pandas as pd
 import numpy as np
-from share.moonboard_util import MoonBoardRoute
+from share.moonboard_route import MoonBoardRoute
 import MoonBoardRNN.BetaMove.preprocessing_helper as ph
 
 

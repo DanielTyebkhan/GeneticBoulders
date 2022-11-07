@@ -14,7 +14,7 @@ from keras.layers import Input
 from MoonBoardRNN.BetaMove.BetaMove import classify_and_reorganize_data_ga, route_to_x_vectors, x_vectors_to_matrix
 from MoonBoardRNN.GradeNet.model_helper import convert_num_to_V_grade
 
-from share.moonboard_util import MoonBoardRoute
+from share.moonboard_route import MoonBoardRoute
 
 class GradeNet:
 	def __init__(self):

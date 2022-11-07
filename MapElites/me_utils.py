@@ -2,7 +2,8 @@ from dataclasses import dataclass
 import math
 from typing import Tuple, List
 
-from share.moonboard_util import MoonBoardRoute
+from share.moonboard_route import MoonBoardRoute
+import share.moonboard_util as mu
 
 @dataclass 
 class MEParams:
@@ -49,11 +50,11 @@ def ME_params_to_route(in_params: List[int]) -> MoonBoardRoute:
 
 
 def get_me_params_bounds():
-    min_mid_holds = MoonBoardRoute.MIN_MID_HOLDS
-    max_mid_holds = MoonBoardRoute.MAX_MID_HOLDS
-    start_range = (MoonBoardRoute.MIN_START_INDEX - 1, MoonBoardRoute.MAX_START_INDEX) # TODO
-    end_range = (MoonBoardRoute.MIN_END_INDEX - 1, MoonBoardRoute.MAX_END_INDEX) # TODO
-    mid_range = (MoonBoardRoute.MIN_MID_INDEX - 1, MoonBoardRoute.MAX_MID_INDEX)
+    min_mid_holds = mu.MIN_MID_HOLDS
+    max_mid_holds = mu.MAX_MID_HOLDS
+    start_range = (mu.MIN_START_INDEX - 1, mu.MAX_START_INDEX)
+    end_range = (mu.MIN_END_INDEX - 1, mu.MAX_END_INDEX)
+    mid_range = (mu.MIN_MID_INDEX - 1, mu.MAX_MID_INDEX)
     num_mid_range = (min_mid_holds - 1, max_mid_holds)
     return [
         start_range,

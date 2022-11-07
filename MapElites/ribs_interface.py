@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import ribs
 import ribs.visualize
 from MoonBoardRNN.GradeNet.grade_net import GradeNet
-from share.moonboard_util import MoonBoardRoute
+from share.moonboard_route import MoonBoardRoute
 from MapElites.me_utils import MEParams, get_me_params_bounds, route_to_ME_params, ME_params_to_route
 import util
 

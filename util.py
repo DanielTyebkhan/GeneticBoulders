@@ -2,6 +2,7 @@ import pickle
 import math
 from typing import Iterable, List, Callable
 
+A_OFFSET = 65
 
 def euclid_distance(p1: Iterable, p2: Iterable):
     return math.sqrt(sum([(c1 - c2)**2 for c1, c2 in zip(p1, p2)]))
