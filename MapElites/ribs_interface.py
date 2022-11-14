@@ -1,5 +1,8 @@
+import copy
 import os
+from statistics import mean, median
 import time
+from typing import List
 import matplotlib.pyplot as plt
 import ribs
 import ribs.visualize
@@ -7,6 +10,39 @@ from MoonBoardRNN.GradeNet.grade_net import GradeNet
 from share.moonboard_route import MoonBoardRoute
 from MapElites.me_utils import MEParams, get_me_params_bounds, route_to_ME_params, ME_params_to_route
 import util
+
+class ExtendedGridArchive(ribs.archives.GridArchive):
+    def clone(self):
+        return copy.deepcopy(self)
+
+    def all_fitnesses(self):
+        return map(lambda x: x.obj, self)
+
+    def __af_map(self, func):
+        return func(self.all_fitnesses())
+
+    def qd_score(self):
+        return self.__af_map(sum)
+
+    def max_fitness(self):
+        return self.__af_map(max)
+
+    def average_fitness(self):
+        return self.__af_map(mean)
+
+
+class Logger:
+    def __init__(self) -> None:
+        self.archives: List[List[ExtendedGridArchive]] = []
+
+    def add_archive(self, generation: int, archive: ExtendedGridArchive):
+        self.archives[generation].append(archive.clone())
+    
+    def gen_qd_score(self, generation: int) -> int:
+        return 0
+
+    def gen_to_archives(self, generation: int) -> ExtendedGridArchive:
+        return self.archives[generation]
 
 
 def grade_string_to_num(grade: str) -> int:
