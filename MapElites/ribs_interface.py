@@ -1,8 +1,10 @@
+from collections import defaultdict
+import numpy as np
 import copy
 import os
 from statistics import mean, median
 import time
-from typing import List
+from typing import Dict, List
 import matplotlib.pyplot as plt
 import ribs
 import ribs.visualize
@@ -12,6 +14,9 @@ from MapElites.me_utils import MEParams, get_me_params_bounds, route_to_ME_param
 import util
 
 class ExtendedGridArchive(ribs.archives.GridArchive):
+    def __init__(self, dims, ranges, seed=None, dtype=np.float64):
+        super().__init__(dims, ranges, seed, dtype)
+
     def clone(self):
         return copy.deepcopy(self)
 
@@ -33,7 +38,7 @@ class ExtendedGridArchive(ribs.archives.GridArchive):
 
 class Logger:
     def __init__(self) -> None:
-        self.archives: List[List[ExtendedGridArchive]] = []
+        self.archives: Dict[int, List[ExtendedGridArchive]] = defaultdict(list)
 
     def add_archive(self, generation: int, archive: ExtendedGridArchive):
         self.archives[generation].append(archive.clone())
@@ -67,9 +72,10 @@ def eval_fitness(route: MoonBoardRoute, target_grade: int, gradenet: GradeNet):
 
 
 def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report_frequency: int=25):
+    logger = Logger()
     target = grade_string_to_num(target_grade)
     gradenet = GradeNet()
-    archive = ribs.archives.GridArchive(params.grid_size, params.bounds)
+    archive = ExtendedGridArchive(params.grid_size, params.bounds)
     input_bounds = get_me_params_bounds()
     initial_routes = [MoonBoardRoute.make_random_valid()] * params.num_emitters
     x0s = [route_to_ME_params(r) for r in initial_routes]
@@ -100,6 +106,7 @@ def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report
             bcs.append([hold_density, hold_variety])
 
         optimizer.tell(objc, bcs)
+        logger.add_archive(itr, archive)
 
         if itr % report_frequency == 0:
             elapsed_time = time.time() - start_time
@@ -109,8 +116,10 @@ def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report
     
     output_dir = os.path.join(save_path, str(time.time()))
     os.makedirs(output_dir, exist_ok=True)
-    pickle_path = os.path.join(output_dir, 'archive.p')
-    util.save_pickle(archive, pickle_path)
+    archive_pickle_path = os.path.join(output_dir, 'archive.p')
+    logger_pickle_path = os.path.join(output_dir, 'logger.p')
+    util.save_pickle(archive, archive_pickle_path)
+    util.save_pickle(logger, logger_pickle_path)
     viz_archive(archive, output_dir)
 
 
