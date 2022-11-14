@@ -15,17 +15,19 @@ def grade_string_to_num(grade: str) -> int:
 
 def eval_fitness(route: MoonBoardRoute, target_grade: int, gradenet: GradeNet):
     # TODO: figure out why we sometimes get a key error
+    fitness = -1
     try:
         if route.is_valid():
             grade = gradenet.grade_route(route)
             num_grade = grade_string_to_num(grade)
             diff = abs(target_grade - num_grade)
             if diff == 0:
-                return 1
-            return 1/diff
+                fitness = 1
+            else:
+                fitness = 1/diff
     except Exception as ex:
-        pass
-    return 0
+        fitness = 0
+    return fitness
 
 
 def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report_frequency: int=25):
