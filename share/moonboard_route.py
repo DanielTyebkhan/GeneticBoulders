@@ -110,7 +110,7 @@ class MoonBoardRoute:
         return [MoonBoardRoute.hold_to_valid_index(h) for h in holds]
 
     def valid_index_to_hold(index: int) -> MoonBoardHold:
-        return MoonBoardRoute.ALL_HOLDS[index]
+        return ALL_HOLDS[index]
 
     def valid_indices_to_holds(indices: List[int]) -> MoonBoardHolds:
         return [MoonBoardRoute.valid_index_to_hold(i) for i in indices]

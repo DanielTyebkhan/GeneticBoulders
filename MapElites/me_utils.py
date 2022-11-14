@@ -37,7 +37,7 @@ def route_to_ME_params(route: MoonBoardRoute):
     start = MoonBoardRoute.hold_to_valid_index(route.start_holds[0])
     end = MoonBoardRoute.hold_to_valid_index(route.end_holds[0])
     n_mid = route.num_mid_holds()
-    return [start, end, n_mid] + MoonBoardRoute.holds_to_indices(route.mid_holds) + [-1] * (MoonBoardRoute.MAX_MID_HOLDS - n_mid)
+    return [start, end, n_mid] + MoonBoardRoute.holds_to_indices(route.mid_holds) + [-1] * (mu.MAX_MID_HOLDS - n_mid)
     
 
 def ME_params_to_route(in_params: List[int]) -> MoonBoardRoute:
