@@ -11,7 +11,7 @@ from MoonBoardRNN.BetaMove.BetaMove import load_feature_dict
 from share.moonboard_route import MoonBoardRoute
 from MapElites.me_utils import MEParams, get_me_params_bounds, route_to_ME_params, ME_params_to_route
 import util
-from tracking import ExtendedGridArchive, Logger
+from MapElites.tracking import ExtendedGridArchive, Logger
 
 
 def grade_string_to_num(grade: str) -> int:
