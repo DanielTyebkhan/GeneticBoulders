@@ -109,4 +109,4 @@ class ExperimentAggregator:
         self.__plot_ranges(lambda x: x.qd_score(), 'QD Score', save_path, show)
 
     def plot_max_fitness(self, save_path: os.PathLike, show: bool=False):
-        self.__plot_ranges(lambda x: x.max_fitness(), 'QD Score', save_path, show)
+        self.__plot_ranges(lambda x: x.max_fitness(), 'Max Fitness', save_path, show)
