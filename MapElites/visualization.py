@@ -10,8 +10,8 @@ def plot_ranges(*, x_coords: List[float], min_vals: List[float], mid_vals: List[
     color = '#B22400'
     fontsize = 14
     fig, ax = plt.subplots(figsize=(4., 4.))
-    ax.fill_between(x_coords, min_vals, max_vals, alpha=0.25, color=color)
-    ax.plot(x_coords, mid_vals, linewdith=2, color=color)
+    ax.fill_between(x_coords, min_vals, max_vals, alpha=0.25, color=color, linewidth=0)
+    ax.plot(x_coords, mid_vals, color=color)
     plt.xlabel(x_label, fontsize=fontsize)
     plt.ylabel(y_label, fontsize=fontsize)
 

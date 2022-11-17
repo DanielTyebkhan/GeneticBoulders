@@ -1,12 +1,9 @@
-import csv
+import os
+from MapElites.tracking import ExperimentAggregator
+from util import load_pickle
+path = '/home/daniel/GeneticBoulders/results/aggregate.p'
 
-with open('coords.txt', 'w') as coordfile:
-    coordfile.write('[')
-    with open('/home/daniel/GeneticBoulders/MoonBoardRNN/BetaMove/HoldFeature2016.csv') as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            coordfile.write(f"({row['X_coord']}, {row['Y_coord']}),")
-
-    coordfile.write(']')
-
-    
+agg: ExperimentAggregator = load_pickle(path)
+agg.plot_max_fitness(os.path.join('results', 'fitness.png'), True)
+agg.plot_qd_score(os.path.join('results', 'qd.png'), True)
+print('')
