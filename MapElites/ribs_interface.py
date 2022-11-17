@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import ribs
 import ribs.visualize
 from MoonBoardRNN.GradeNet.grade_net import GradeNet
+from MoonBoardRNN.BetaMove.BetaMove import load_feature_dict
 from share.moonboard_route import MoonBoardRoute
 from MapElites.me_utils import MEParams, get_me_params_bounds, route_to_ME_params, ME_params_to_route
 import util
@@ -32,6 +33,9 @@ class ExtendedGridArchive(ribs.archives.GridArchive):
     def max_fitness(self):
         return self.__af_map(max)
 
+    def min_fitness(self):
+        return self.__af_map(min)
+
     def average_fitness(self):
         return self.__af_map(mean)
 
@@ -54,7 +58,7 @@ def grade_string_to_num(grade: str) -> int:
     return int(grade[1:])
 
 
-def eval_fitness(route: MoonBoardRoute, target_grade: int, gradenet: GradeNet):
+def eval_fitness(route: MoonBoardRoute, target_grade: int, gradenet: GradeNet, feature_dict=None):
     # TODO: figure out why we sometimes get a key error
     fitness = -1
     try:
@@ -90,20 +94,18 @@ def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report
         ) for i in range(params.num_emitters)
     ]
     optimizer = ribs.optimizers.Optimizer(archive, emitters)
+    feature_dict = load_feature_dict()
     start_time = time.time()
     for itr in range(1, params.iterations + 1):
         population = optimizer.ask()
         objc, bcs = [], []
         for individual in population:
             route = ME_params_to_route(individual)
-            fitness = eval_fitness(route, target, gradenet)
+            fitness = eval_fitness(route, target, gradenet, feature_dict)
             hold_variety = route.get_hold_variety()
-            hold_density = route.get_hold_density()
-            if hold_variety in [1, 4] and (hold_density < 0.4 or hold_density > 0.8):
-                hold_density = 0.5
-                hold_density = 3
+            max_span = route.get_hold_density()
             objc.append(fitness)
-            bcs.append([hold_density, hold_variety])
+            bcs.append([max_span, hold_variety])
 
         optimizer.tell(objc, bcs)
         logger.add_archive(itr, archive)
@@ -130,7 +132,7 @@ def viz_archive(archive, output_dir):
 
 def plot_archive_heatmap(archive, save_path):
     plt.ylabel('Hold Diversity')
-    plt.xlabel('Hold Density')
+    plt.xlabel('Max Span')
     ribs.visualize.grid_archive_heatmap(archive)
     plt.savefig(save_path)
     plt.show()

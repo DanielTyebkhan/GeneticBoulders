@@ -76,11 +76,11 @@ class MoonBoardRoute:
 
     def get_hold_variety(self):
         # TODO
-        return random.randint(1, 5)
+        return random.randint(1, 6)
 
-    def get_hold_density(self):
+    def get_max_span(self):
         # TODO
-        return random.uniform(0, 1)
+        return random.randint(0, 5)
 
     def from_hold_strings(*, start_holds: List[str], mid_holds: List[str], end_holds: List[str]):
         start_holds = MoonBoardHold.from_string_list(start_holds)

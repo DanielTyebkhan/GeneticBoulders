@@ -59,8 +59,8 @@ class GradeNet:
 	def load_pretrained_weights(self, weights_path):
 		self.__model.load_weights(weights_path)
 
-	def grade_route(self, route: MoonBoardRoute) -> str:
-		x_vectors = route_to_x_vectors(route)
+	def grade_route(self, route: MoonBoardRoute, feature_dict=None) -> str:
+		x_vectors = route_to_x_vectors(route, feature_dict)
 		matrix = x_vectors_to_matrix(x_vectors)
 		normalized_matrix = normalization(matrix)
 		container = np.array([normalized_matrix])
