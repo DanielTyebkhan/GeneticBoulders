@@ -103,7 +103,7 @@ def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report
             route = ME_params_to_route(individual)
             fitness = eval_fitness(route, target, gradenet, feature_dict)
             hold_variety = route.get_hold_variety()
-            max_span = route.get_hold_density()
+            max_span = route.get_max_span()
             objc.append(fitness)
             bcs.append([max_span, hold_variety])
 
