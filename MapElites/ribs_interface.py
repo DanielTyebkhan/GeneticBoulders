@@ -1,6 +1,4 @@
-from collections import defaultdict
-import numpy as np
-import copy
+from threading import Thread
 import os
 from statistics import mean, median
 import time
@@ -13,45 +11,7 @@ from MoonBoardRNN.BetaMove.BetaMove import load_feature_dict
 from share.moonboard_route import MoonBoardRoute
 from MapElites.me_utils import MEParams, get_me_params_bounds, route_to_ME_params, ME_params_to_route
 import util
-
-class ExtendedGridArchive(ribs.archives.GridArchive):
-    def __init__(self, dims, ranges, seed=None, dtype=np.float64):
-        super().__init__(dims, ranges, seed, dtype)
-
-    def clone(self):
-        return copy.deepcopy(self)
-
-    def all_fitnesses(self):
-        return map(lambda x: x.obj, self)
-
-    def __af_map(self, func):
-        return func(self.all_fitnesses())
-
-    def qd_score(self):
-        return self.__af_map(sum)
-
-    def max_fitness(self):
-        return self.__af_map(max)
-
-    def min_fitness(self):
-        return self.__af_map(min)
-
-    def average_fitness(self):
-        return self.__af_map(mean)
-
-
-class Logger:
-    def __init__(self) -> None:
-        self.archives: Dict[int, List[ExtendedGridArchive]] = defaultdict(list)
-
-    def add_archive(self, generation: int, archive: ExtendedGridArchive):
-        self.archives[generation].append(archive.clone())
-    
-    def gen_qd_score(self, generation: int) -> int:
-        return 0
-
-    def gen_to_archives(self, generation: int) -> ExtendedGridArchive:
-        return self.archives[generation]
+from tracking import ExtendedGridArchive, Logger
 
 
 def grade_string_to_num(grade: str) -> int:
@@ -122,8 +82,16 @@ def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report
     logger_pickle_path = os.path.join(output_dir, 'logger.p')
     util.save_pickle(archive, archive_pickle_path)
     util.save_pickle(logger, logger_pickle_path)
-    viz_archive(archive, output_dir)
+    # viz_archive(archive, output_dir)
+    return logger
 
+def thread_target(queue):
+    task = queue.get()
+
+
+def parallel_experiment(target_grade, params, save_path, report_frequency=25, num_threads=4):
+    thread_target = lambda: run_mapelites(target_grade=target_grade, params=params, save_path=save_path, report_frequency=report_frequency)
+    workers = [Thread(target=thread_target)]
 
 
 def viz_archive(archive, output_dir):
@@ -135,7 +103,6 @@ def plot_archive_heatmap(archive, save_path):
     plt.xlabel('Max Span')
     ribs.visualize.grid_archive_heatmap(archive)
     plt.savefig(save_path)
-    plt.show()
 
 def draw_archive_on_board(archive: ribs.archives.GridArchive, save_path):
     for elite in archive:
