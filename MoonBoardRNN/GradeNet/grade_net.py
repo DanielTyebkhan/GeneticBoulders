@@ -63,7 +63,6 @@ class GradeNet:
 		x_vectors = route_to_x_vectors(route)
 		matrix = x_vectors_to_matrix(x_vectors)
 		normalized_matrix = normalization(matrix)
-		# TODO: NORMALIZE THE MATRIX
 		container = np.array([normalized_matrix])
 		pred = self.__model.predict(container, verbose=0).argmax(axis = 1)
 		return convert_num_to_V_grade(pred[0])
