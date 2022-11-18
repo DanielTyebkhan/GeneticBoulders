@@ -1,6 +1,5 @@
-from threading import Thread
+import multiprocessing as mp
 import os
-from statistics import mean, median
 import time
 from typing import Dict, List
 import matplotlib.pyplot as plt
@@ -11,7 +10,7 @@ from MoonBoardRNN.BetaMove.BetaMove import load_feature_dict
 from share.moonboard_route import MoonBoardRoute
 from MapElites.me_utils import MEParams, get_me_params_bounds, route_to_ME_params, ME_params_to_route
 import util
-from MapElites.tracking import ExtendedGridArchive, Logger
+from MapElites.tracking import ExperimentAggregator, ExtendedGridArchive, Logger
 
 
 def grade_string_to_num(grade: str) -> int:
@@ -85,13 +84,31 @@ def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report
     # viz_archive(archive, output_dir)
     return logger
 
-def thread_target(queue):
-    task = queue.get()
+def __thread_target(task_queue: mp.Queue, res_queue: mp.Queue, target_grade, params, save_path, report_frequency) -> List[Logger]:
+    while (task := task_queue.get()) is not None:
+        logger = task(target_grade=target_grade, params=params, save_path=save_path, report_frequency=report_frequency)
+        res_queue.put(logger)
 
-
-def parallel_experiment(target_grade, params, save_path, report_frequency=25, num_threads=4):
-    thread_target = lambda: run_mapelites(target_grade=target_grade, params=params, save_path=save_path, report_frequency=report_frequency)
-    workers = [Thread(target=thread_target)]
+def parallel_experiment(target_grade: str, params: MEParams, output_dir: os.PathLike, num_runs: int, num_threads: int, report_frequency: int=25):
+    os.makedirs(output_dir, exist_ok=True)
+    res_queue = mp.Queue()
+    task_queue = mp.Queue()
+    for _ in range(num_runs):
+        task_queue.put(run_mapelites)
+    procs: List[mp.Process] = []
+    for i in range(num_threads):
+        task_queue.put(None)
+        proc = mp.Process(target=__thread_target, args=(task_queue, res_queue, target_grade, params, output_dir, report_frequency))
+        procs.append(proc)
+        proc.start()
+    for p in procs:
+        p.join()
+    aggregator = ExperimentAggregator()
+    while not res_queue.empty():
+        logger = res_queue.get()
+        aggregator.add_logger(logger)
+    util.save_pickle(aggregator, os.path.join(output_dir, 'aggregator.p'))
+    return aggregator
 
 
 def viz_archive(archive, output_dir):

@@ -20,8 +20,6 @@
 
 from util import load_pickle
 
-path = '/home/daniel/GeneticBoulders/results/big_run/aggregate.p'
+path = '/home/tyebkhad/GeneticBoulders/results/V5Exp/aggregator.p'
 agg = load_pickle(path)
-agg.plot_qd_score('/home/daniel/GeneticBoulders/results/big_run/qd_score.png')
-agg.plot_max_fitness('/home/daniel/GeneticBoulders/results/big_run/max_fitness.png')
 print('')
