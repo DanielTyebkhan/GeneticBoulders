@@ -4,10 +4,10 @@ import matplotlib.pyplot as plt
 from matplotlib import cbook
 import re
 
-def plot_route(route):
-    plot_problem(route.to_strings())
+def plot_route(route, save_path, show=False):
+    plot_problem(route.to_strings(), save_path=save_path, show=show)
 
-def plot_problem(stringList, start_num = 1, title = None, key = None, save = None):    
+def plot_problem(stringList, start_num = 1, title = None, save_path=None, show=False):    
     p_dir = pathlib.Path(__file__).parent
     image_path = os.path.join(p_dir, 'moonboard2016Background.jpg')
     image_file = cbook.get_sample_data(image_path)
@@ -48,7 +48,8 @@ def plot_problem(stringList, start_num = 1, title = None, key = None, save = Non
         
     if title:
         plt.title(title)
-    if save:
-        plt.savefig(key + '.jpg', dpi = 200)
+    if save_path:
+        plt.savefig(save_path, dpi = 200)
     # Show the image
-    plt.show()
+    if show:
+        plt.show()
