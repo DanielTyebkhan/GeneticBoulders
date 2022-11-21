@@ -108,6 +108,7 @@ def parallel_experiment(target_grade: str, params: MEParams, output_dir: os.Path
         logger = res_queue.get()
         aggregator.add_logger(logger)
     util.save_pickle(aggregator, os.path.join(output_dir, 'aggregator.p'))
+    util.save_pickle(params, os.path.join(output_dir, 'me_params.p'))
     return aggregator
 
 
