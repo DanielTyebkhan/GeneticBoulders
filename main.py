@@ -3,7 +3,7 @@ from MapElites.me_utils import MEParams
 import MapElites.ribs_interface as me
 
 def main():
-    num_reps = 12
+    num_reps = 6
     ind_per_emitter = 2
     iterations = 10
     params = MEParams(

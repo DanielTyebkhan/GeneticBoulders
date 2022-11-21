@@ -84,28 +84,16 @@ def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report
     # viz_archive(archive, output_dir)
     return logger
 
-def __thread_target(task_queue: mp.Queue, res_queue: mp.Queue, target_grade, params, save_path, report_frequency) -> List[Logger]:
-    while (task := task_queue.get()) is not None:
-        logger = task(target_grade=target_grade, params=params, save_path=save_path, report_frequency=report_frequency)
-        res_queue.put(logger)
+def __thread_target(target_grade, params, save_path, report_frequency) -> List[Logger]:
+    logger = run_mapelites(target_grade=target_grade, params=params, save_path=save_path, report_frequency=report_frequency)
+    return logger
 
 def parallel_experiment(target_grade: str, params: MEParams, output_dir: os.PathLike, num_runs: int, num_threads: int, report_frequency: int=25):
     os.makedirs(output_dir, exist_ok=True)
-    res_queue = mp.Queue()
-    task_queue = mp.Queue()
-    for _ in range(num_runs):
-        task_queue.put(run_mapelites)
-    procs: List[mp.Process] = []
-    for i in range(num_threads):
-        task_queue.put(None)
-        proc = mp.Process(target=__thread_target, args=(task_queue, res_queue, target_grade, params, output_dir, report_frequency))
-        procs.append(proc)
-        proc.start()
-    for p in procs:
-        p.join()
+    with mp.Pool(num_threads) as pool:
+        loggers = pool.starmap(__thread_target, [(target_grade, params, output_dir, report_frequency)] * num_runs)
     aggregator = ExperimentAggregator()
-    while not res_queue.empty():
-        logger = res_queue.get()
+    for logger in loggers:
         aggregator.add_logger(logger)
     util.save_pickle(aggregator, os.path.join(output_dir, 'aggregator.p'))
     util.save_pickle(params, os.path.join(output_dir, 'me_params.p'))
