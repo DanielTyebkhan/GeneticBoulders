@@ -72,8 +72,6 @@ class MoonBoardRoute:
         ]
         return all(conditions)
 
-    ### Static Methods ###
-
     def get_hold_variety(self):
         # TODO
         return random.randint(0, 6)
@@ -82,6 +80,8 @@ class MoonBoardRoute:
         # TODO
         return random.randint(0, 6)
 
+    ### Static Methods ###
+
     def from_hold_strings(*, start_holds: List[str], mid_holds: List[str], end_holds: List[str]):
         start_holds = MoonBoardHold.from_string_list(start_holds)
         mid_holds = MoonBoardHold.from_string_list(mid_holds)
@@ -89,7 +89,7 @@ class MoonBoardRoute:
         return MoonBoardRoute(start_holds=start_holds, mid_holds=mid_holds, end_holds=end_holds)
 
     def make_random():
-        # can randomize num start and end holds
+        # can randomize num start and end holds in future
         num_start = 1
         num_end = 1
         num_mid = random.randint(MIN_MID_HOLDS, MAX_MID_HOLDS)
