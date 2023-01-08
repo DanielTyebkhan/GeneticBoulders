@@ -165,6 +165,28 @@ class beta:
         self.singleMoveSuccessRate = []  # singleMoveDifficulty
         self.tryout = 0                  # Try one additional point. Record successRate
         self.touchEndHold = 0
+
+    def to_x_vectors(self):
+        """
+        Adopted from moveGeneratorForAllProblem
+        """
+        numOfMoves = len(self.handSequence) - 2
+        movesInfoList = moveGenerator(self, string_mode = False)
+        x_vectors = np.zeros((22, numOfMoves))
+        
+        for orderOfMove, moveInfoDict in enumerate(movesInfoList):   
+            x_vectors[0:2, orderOfMove] = moveInfoDict['TargetHoldString'] 
+            x_vectors[2, orderOfMove] = moveInfoDict['TargetHoldHand'] # only express once
+            x_vectors[3, orderOfMove] = moveInfoDict['TargetHoldScore']
+            x_vectors[4:6, orderOfMove] = moveInfoDict['RemainingHoldString']
+            x_vectors[6, orderOfMove] = moveInfoDict['RemainingHoldScore']
+            x_vectors[7:9, orderOfMove] = moveInfoDict['dxdyRtoT']
+            x_vectors[9:11, orderOfMove] = moveInfoDict['MovingHoldString']
+            x_vectors[11, orderOfMove] = moveInfoDict['MovingHoldScore']
+            x_vectors[12:14, orderOfMove] = moveInfoDict['dxdyMtoT']
+            x_vectors[14:21, orderOfMove] = moveInfoDict['FootPlacement']
+            x_vectors[21, orderOfMove] = moveInfoDict['MoveSuccessRate']
+        return x_vectors
         
     def addStartHolds(self, zeroOrOne):
         """ Specifically add the first two hold as the starting hold. Consider one hold start situation"""

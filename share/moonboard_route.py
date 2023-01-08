@@ -1,8 +1,12 @@
 import random
 from typing import List, Optional
 
+import numpy as np
+
 from share.moonboard_util import *
 from uuid import UUID, uuid1
+import MoonBoardRNN.BetaMove.preprocessing_helper as ph
+from MoonBoardRNN.BetaMove.BetaMove import load_feature_dict
 
 
 class MoonBoardRoute:
@@ -79,6 +83,35 @@ class MoonBoardRoute:
     def get_max_span(self):
         # TODO
         return random.randint(0, 6)
+
+    def classify_and_reorganize_data_ga(self, feature_dict=None):
+        if feature_dict is None:
+            feature_dict = load_feature_dict()
+
+        n_start = self.num_starting_holds()
+        n_mid = self.num_mid_holds()
+        n_hold = self.num_holds()
+        start_sorted = sorted(self.start_holds, key=lambda h: h.row)
+        mid_sorted = sorted(self.mid_holds, key=lambda h: h.row)
+        end_sorted = sorted(self.end_holds, key=lambda h: h.row)
+        all_holds = start_sorted + mid_sorted + end_sorted
+
+        x_vectors = np.zeros((10, n_hold))
+        for i, hold in enumerate(all_holds):
+            x, y = hold.col, hold.row
+            x_vectors[0:6, i] = feature_dict[(x, y)] # hand feature encoding
+            x_vectors[6:8, i] = [x, y] # coordinate encoding
+        x_vectors[8:, 0:n_start] = np.array([[1], [0]])
+        x_vectors[8:, n_start + n_mid:] = np.array([[0], [1]])
+        return x_vectors
+
+    def to_x_vectors(self, feature_dict=None):
+        route_id = self.get_id_str()
+        data_dict = {route_id: self.classify_and_reorganize_data_ga(feature_dict=feature_dict)}
+        beta = ph.produce_sequence(route_id, data_dict, printout=False)[0]
+        x_vectors = beta.to_x_vectors()
+        return x_vectors
+
 
     ### Static Methods ###
 
