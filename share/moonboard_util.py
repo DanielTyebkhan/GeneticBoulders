@@ -61,9 +61,8 @@ END_HOLDS = ALL_HOLDS[MIN_END_INDEX:MAX_END_INDEX+1]
 
 HOLE_DISTANCE = 7.875  # square edge size in inches between holds on moonboard
 CLIMBER_ARMSPAN = 60
-REACH_GRAPH = {
-    hold: {h for h in ALL_HOLDS if util.euclid_distance((hold.col, hold.row), (h.col, h.row)) * HOLE_DISTANCE < CLIMBER_ARMSPAN} for hold in ALL_HOLDS
-}
+DIST_GRAPH = {hold: {h: util.euclid_distance((hold.col, hold.row), (h.col, h.row)) * HOLE_DISTANCE for h in ALL_HOLDS} for hold in ALL_HOLDS}
+REACH_GRAPH = {hold: {h for h in ALL_HOLDS if DIST_GRAPH[hold][h] < CLIMBER_ARMSPAN} for hold in ALL_HOLDS}
 
 def hold_string_range(row: int, start_col: str, end_col: str):
     holds = []
