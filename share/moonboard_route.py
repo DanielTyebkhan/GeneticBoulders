@@ -81,9 +81,9 @@ class MoonBoardRoute:
         # TODO
         return random.randint(0, 6)
 
-    def get_max_span(self, feature_dict):
+    def get_max_span(self, feature_dict=None):
         self.init_beta(feature_dict)
-        coords = [(h[6], h[7]) for h in self.beta.allHolds]
+        coords = [MoonBoardHold.from_xy(int(h[6]), int(h[7])) for h in self.beta.allHolds]
         joined = zip(self.beta.handOperator, self.beta.handSequence)
         left = next(joined)[1]
         right = next(joined)[1]
