@@ -11,7 +11,7 @@ from keras.layers.core import Dense
 from keras.layers import Flatten, LSTM, Masking
 from keras.models import Model
 from keras.layers import Input
-from MoonBoardRNN.BetaMove.BetaMove import normalization, route_to_x_vectors, x_vectors_to_matrix
+from MoonBoardRNN.BetaMove.BetaMove import normalization, x_vectors_to_matrix
 from MoonBoardRNN.GradeNet.model_helper import convert_num_to_V_grade
 
 from share.moonboard_route import MoonBoardRoute
@@ -60,7 +60,7 @@ class GradeNet:
 		self.__model.load_weights(weights_path)
 
 	def grade_route(self, route: MoonBoardRoute, feature_dict=None) -> str:
-		x_vectors = route_to_x_vectors(route, feature_dict)
+		x_vectors = route.to_x_vectors(feature_dict)
 		matrix = x_vectors_to_matrix(x_vectors)
 		normalized_matrix = normalization(matrix)
 		container = np.array([normalized_matrix])
