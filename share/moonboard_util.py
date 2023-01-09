@@ -1,7 +1,9 @@
 from math import sqrt
-from typing import List
+from typing import Dict, List
 from dataclasses import dataclass
 import util
+from csv import DictReader
+
 
 
 def moonboard_row_to_index(row: int) -> int:
@@ -31,6 +33,25 @@ class MoonBoardHold:
 
 
 MoonBoardHolds = List[MoonBoardHold]
+
+def load_hold_types(path: str) -> Dict[MoonBoardHold, int]:
+    '''
+    1 = small crimp
+    2 = large crimp
+    3 = small pinch
+    4 = large pinch
+    5 = small pocket
+    6 = large pocket
+    '''
+    types = {}
+    with open(path, 'r') as file:
+        reader = DictReader(file, ['y', 'x', 'val'])
+        next(reader)
+        for row in reader:
+            types[(MoonBoardHold(int(row['y']), int(row['x'])))] = int(row['val'])
+    return types
+
+
 
 
 COLUMNS = 11
@@ -63,6 +84,8 @@ HOLE_DISTANCE = 7.875  # square edge size in inches between holds on moonboard
 CLIMBER_ARMSPAN = 60
 DIST_GRAPH = {hold: {h: util.euclid_distance((hold.col, hold.row), (h.col, h.row)) * HOLE_DISTANCE for h in ALL_HOLDS} for hold in ALL_HOLDS}
 REACH_GRAPH = {hold: {h for h in ALL_HOLDS if DIST_GRAPH[hold][h] < CLIMBER_ARMSPAN} for hold in ALL_HOLDS}
+
+HOLD_TYPES = load_hold_types('holdtypes.csv')
 
 def hold_string_range(row: int, start_col: str, end_col: str):
     holds = []

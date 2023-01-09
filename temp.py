@@ -23,5 +23,5 @@
 #     writer = csv.DictWriter(file, ['x', 'y', 'val'])
 #     writer.writeheader()
 #     writer.writerows(remap)
-from share.moonboard_util import ALL_HOLDS
-print(len(ALL_HOLDS))
+from share.moonboard_util import HOLD_TYPES
+print(HOLD_TYPES)
