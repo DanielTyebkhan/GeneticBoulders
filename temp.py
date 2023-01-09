@@ -1,25 +1,27 @@
-# import os
-# from MapElites.tracking import ExperimentAggregator
-# from util import load_pickle
-# from MoonBoardRNN.plotting import plot_route
-# from MapElites.me_utils import ME_params_to_route
-# archives = [
-#         '/home/daniel/GeneticBoulders/results/1668706120.819965/archive.p',
-#         '/home/daniel/GeneticBoulders/results/1668707131.2126865/archive.p',
-#         '/home/daniel/GeneticBoulders/results/1668708277.0423818/archive.p',
-#         '/home/daniel/GeneticBoulders/results/1668709058.825623/archive.p',
-#         '/home/daniel/GeneticBoulders/results/1668709810.6575437/archive.p'
-#         ]
-
-# savepath = '/home/daniel/Desktop/route_images'
-# for i, path in enumerate(archives):
-#     archive = load_pickle(path)
-#     for j, elite in enumerate(archive):
-#         plot_route(ME_params_to_route(elite.sol), os.path.join(savepath, f'{str(i)}_{str(j)}.jpg'))
+# import csv
     
 
-from util import load_pickle
+# read_path = '/home/daniel/Downloads/Moonboard types - Sheet2.csv'
+# save_path = 'holdtypes.csv'
+# remap = []
+# with open(read_path, 'r') as file:
+#     reader = csv.reader(file)
+#     next(reader)
+#     for row in reader:
+#         y = int(row[0])
+#         for x, val in enumerate(row[1:]):
+#             if val != '':
+#                 remap.append(
+#                     {
+#                         'x': int(x),
+#                         'y': int(y),
+#                         'val': int(val)
+#                     }
+#                 )
 
-path = '/home/tyebkhad/GeneticBoulders/results/V5Exp/aggregator.p'
-agg = load_pickle(path)
-print('')
+# with open(save_path, 'w') as file:
+#     writer = csv.DictWriter(file, ['x', 'y', 'val'])
+#     writer.writeheader()
+#     writer.writerows(remap)
+from share.moonboard_util import ALL_HOLDS
+print(len(ALL_HOLDS))
