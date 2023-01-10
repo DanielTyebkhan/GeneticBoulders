@@ -78,8 +78,9 @@ class MoonBoardRoute:
         return all(conditions)
 
     def get_hold_variety(self):
-        # TODO
-        return random.randint(0, 6)
+        many = self.get_all_holds()
+        types = HOLD_TYPES
+        return len({HOLD_TYPES[h] for h in self.get_all_holds()})
 
     def get_max_span(self, feature_dict=None):
         self.init_beta(feature_dict)
@@ -97,11 +98,6 @@ class MoonBoardRoute:
             else:
                 right = index
         return max_span
-
-
-
-        return max_span
-        return random.randint(0, 6)
 
     def classify_and_reorganize_data_ga(self, feature_dict=None):
         if feature_dict is None:

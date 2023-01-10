@@ -45,7 +45,7 @@ def load_hold_types(path: str) -> Dict[MoonBoardHold, int]:
     '''
     types = {}
     with open(path, 'r') as file:
-        reader = DictReader(file, ['y', 'x', 'val'])
+        reader = DictReader(file, ['x', 'y', 'val'])
         next(reader)
         for row in reader:
             types[(MoonBoardHold(int(row['y']), int(row['x'])))] = int(row['val'])

@@ -1,5 +1,5 @@
 # import csv
-    
+
 
 # read_path = '/home/daniel/Downloads/Moonboard types - Sheet2.csv'
 # save_path = 'holdtypes.csv'
@@ -25,3 +25,4 @@
 #     writer.writerows(remap)
 from share.moonboard_util import HOLD_TYPES
 print(HOLD_TYPES)
+print(len(HOLD_TYPES))
