@@ -75,11 +75,10 @@ class MoonBoardRoute:
             self.num_holds() <= MAX_HOLDS,
             self.has_feasible_path()
         ]
-        return all(conditions)
+        valid = all(conditions)
+        return valid
 
     def get_hold_variety(self):
-        many = self.get_all_holds()
-        types = HOLD_TYPES
         return len({HOLD_TYPES[h] for h in self.get_all_holds()})
 
     def get_max_span(self, feature_dict=None):

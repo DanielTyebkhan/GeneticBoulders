@@ -43,12 +43,20 @@ def load_hold_types(path: str) -> Dict[MoonBoardHold, int]:
     5 = small pocket
     6 = large pocket
     '''
+    hold_categories = {
+        1: 'crimp',
+        2: 'crimp',
+        3: 'pinch',
+        4: 'pinch',
+        5: 'pocket',
+        6: 'pocket'
+    }
     types = {}
     with open(path, 'r') as file:
         reader = DictReader(file, ['x', 'y', 'val'])
         next(reader)
         for row in reader:
-            types[(MoonBoardHold(int(row['y']), int(row['x'])))] = int(row['val'])
+            types[(MoonBoardHold(int(row['y']), int(row['x'])))] = hold_categories[int(row['val'])]
     return types
 
 
