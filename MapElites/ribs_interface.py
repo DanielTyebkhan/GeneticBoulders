@@ -18,7 +18,6 @@ def grade_string_to_num(grade: str) -> int:
 
 
 def eval_fitness(route: MoonBoardRoute, target_grade: int, gradenet: GradeNet, feature_dict=None):
-    # TODO: figure out why we sometimes get a key error
     fitness = -1
     try:
         if route.is_valid():
