@@ -13,6 +13,19 @@ import util
 from MapElites.tracking import ExperimentAggregator, ExtendedGridArchive, Logger
 
 
+class DiscreteKSwaps(ribs.emitters.EmitterBase):
+    """
+    Derived from https://arxiv.org/pdf/1904.10656v1.pdf
+    """
+
+    def __init__(archive, solution_dim, bounds):
+        super().__init__(archive, solution_dim, bounds)
+    
+
+    
+    
+
+
 def grade_string_to_num(grade: str) -> int:
     return int(grade[1:])
 
@@ -39,7 +52,7 @@ def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report
     gradenet = GradeNet()
     archive = ExtendedGridArchive(params.grid_size, params.bounds)
     input_bounds = get_me_params_bounds()
-    initial_routes = [MoonBoardRoute.make_random_valid()] * params.num_emitters
+    initial_routes = [MoonBoardRoute.make_random_valid() for _ in range(params.num_emitters)]
     x0s = [route_to_ME_params(r) for r in initial_routes]
     emitters = [
         ribs.emitters.ImprovementEmitter(
