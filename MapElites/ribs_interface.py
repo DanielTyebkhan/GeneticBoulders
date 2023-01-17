@@ -20,6 +20,7 @@ class DiscreteKSwapsEmitter(ribs.emitters.EmitterBase):
         Mapping Hearthstone Deck Spaces through MAP-Elites with Sliding Boundaries
         Fontaine et al
         https://arxiv.org/pdf/1904.10656v1.pdf
+    Only one of these should be used
     """
 
     def __init__(self, archive: ribs.archives.ArchiveBase, initial_elite: List, option_pool: Iterable, batch_size: int, num_top_elites: int):
@@ -32,9 +33,6 @@ class DiscreteKSwapsEmitter(ribs.emitters.EmitterBase):
         """
         super().__init__(archive, len(initial_elite), None)
         self.__option_pool = set(option_pool)
-        self.__num_top_elites = num_top_elites
-        self.__elites = [initial_elite.copy() for _ in range(num_top_elites)]
-        self.__fitnesses = [0 for _ in range(len(self.__elites))]
         self.__batch_size = batch_size
 
     def __pick_k(self):
@@ -51,12 +49,8 @@ class DiscreteKSwapsEmitter(ribs.emitters.EmitterBase):
                 break
         return k
 
-    def __select_elite(self, elites):
-        return random.choice(elites)
-
-    def __get_best_elites(self):
-        fit_elites = sorted(zip(self.__fitnesses, self.__elites), key=lambda x: x[0])
-        return [x[1] for x in fit_elites][:self.__num_top_elites]
+    def __select_elite(self):
+        return self.archive.get_random_elite()
 
     def __mutate_elite(self, elite):
         k = self.__pick_k()
@@ -73,18 +67,17 @@ class DiscreteKSwapsEmitter(ribs.emitters.EmitterBase):
         return new_elite
  
     def ask(self):
-        best_elites = self.__get_best_elites(self.__elites)
         elites = []
         for _ in range(self.__batch_size):
-            elite = self.__select_elite(best_elites)
+            elite = self.__select_elite()
             new_elite = self.__mutate_elite(elite)
             elites.append(new_elite)
-        self.__elites = elites
-        return elites.copy()
+        return elites
             
-    def tell(self, scores, behaviors):
-        """ make sure to sort and set self.__elites """
-        self.__fitnesses = scores.copy()
+    def tell(self, solutions: List[List], objective_values: List[float], behavior_values: List[List[float]], metadata=None):
+        for elite, fitness, behavior in zip(solutions, objective_values, behavior_values):
+            self.archive.add(elite, fitness, behavior)
+        
 
 
 def grade_string_to_num(grade: str) -> int:
