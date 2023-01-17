@@ -95,7 +95,7 @@ class MoonBoardRoute:
                 left = index
             else:
                 right = index
-        return max_span
+        return max_span / 12
 
     def classify_and_reorganize_data_ga(self, feature_dict=None):
         if feature_dict is None:

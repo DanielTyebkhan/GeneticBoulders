@@ -43,7 +43,7 @@ class DiscreteKSwapsEmitter(ribs.emitters.EmitterBase):
         P(k) = 0.5 * P(k-1)
         P(1) = 0.5
         """
-        k_offset = 0
+        k_offset = 5
         while True:
             r = random.random()
             k = 1 + k_offset
@@ -110,9 +110,6 @@ def eval_fitness(route: MoonBoardRoute, target_grade: int, gradenet: GradeNet, f
 
 
 def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report_frequency: int=25):
-    print(
-        'starting'
-    )
     logger = Logger()
     target = grade_string_to_num(target_grade)
     gradenet = GradeNet()
@@ -136,13 +133,13 @@ def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report
         population = optimizer.ask()
         objc, bcs = [], []
         for ind, individual in enumerate(population):
-            print(f'{itr}: evluating individual {ind+1}', end='\r')
+            print(f'{itr}: evaluating individual {ind+1}', end='\r')
             route = ME_params_to_route(individual)
             fitness = eval_fitness(route, target, gradenet, feature_dict)
             hold_variety = route.get_hold_variety()
             max_span = route.get_max_span(feature_dict)
             objc.append(fitness)
-            bcs.append([max_span, hold_variety])
+            bcs.append([hold_variety, max_span])
         print('')
 
         optimizer.tell(objc, bcs)
