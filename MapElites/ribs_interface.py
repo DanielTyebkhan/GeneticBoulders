@@ -9,6 +9,7 @@ from MoonBoardRNN.GradeNet.grade_net import GradeNet
 from MoonBoardRNN.BetaMove.BetaMove import load_feature_dict
 from share.moonboard_route import MoonBoardRoute
 from MapElites.me_utils import MEParams, get_me_params_bounds, route_to_ME_params, ME_params_to_route
+from share.moonboard_util import END_HOLDS, MAX_MID_HOLDS, MID_HOLDS, MIN_MID_HOLDS, START_HOLDS
 import util
 from MapElites.tracking import ExperimentAggregator, ExtendedGridArchive, Logger
 
@@ -105,24 +106,15 @@ def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report
     target = grade_string_to_num(target_grade)
     gradenet = GradeNet()
     archive = ExtendedGridArchive(params.grid_size, params.bounds)
-    input_bounds = get_me_params_bounds()
     initial_routes = [MoonBoardRoute.make_random_valid() for _ in range(params.num_emitters)]
-    # x0s = [route_to_ME_params(r) for r in initial_routes]
+    x0s = [route_to_ME_params(r) for r in initial_routes ]
+    option_pools = [START_HOLDS, END_HOLDS, MID_HOLDS + [None] for _ in range(MAX_MID_HOLDS)]
     emitters = [DiscreteKSwapsEmitter(
         archive=archive,
         initial_elite=x0s[i],
-
-    )]
-    emitters = [
-        ribs.emitters.ImprovementEmitter(
-            archive=archive, 
-            x0=x0s[i],
-            sigma0=params.sigma_0,
-            batch_size=params.batch_size,
-            bounds=input_bounds,
-            restart_rule='basic'
-        ) for i in range(params.num_emitters)
-    ]
+        option_poosls=option_pools,
+        batch_size=params.batch_size
+    ) for i in range(params.num_emitters)]
     optimizer = ribs.optimizers.Optimizer(archive, emitters)
     feature_dict = load_feature_dict()
     start_time = time.time()
