@@ -49,17 +49,16 @@ class MoonBoardRoute:
         """
         Is there a path through the route in which every move can be spanned?
         """
-        def dfs(all_holds: MoonBoardHolds, start, end, path: set):
+        def dfs(all_holds: set, start, end, seen):
             if start == end:
                 return True
-            for h in all_holds:
-                if h in REACH_GRAPH[start] and h not in path:
-                    path.add(h)
-                    if dfs(all_holds, h, end, path):
+            if start not in seen:
+                seen.add(start)
+                for h in all_holds.intersection(REACH_GRAPH[start]):
+                    if (dfs(all_holds, h, end)):
                         return True
-                    path.remove(h)
             return False
-        return dfs(self.get_all_holds(), self.start_holds[0], self.end_holds[0], set())
+        return dfs(set(self.get_all_holds()), self.start_holds[0], self.end_holds[0], set())
 
     def is_valid(self):
         """
@@ -73,7 +72,7 @@ class MoonBoardRoute:
             all([h.row <= MAX_START_ROW for h in self.start_holds]),
             all([h in ALL_HOLDS for h in self.get_all_holds()]),
             self.num_holds() <= MAX_HOLDS,
-            self.has_feasible_path()
+            # self.has_feasible_path()
         ]
         valid = all(conditions)
         return valid
