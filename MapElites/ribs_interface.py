@@ -20,10 +20,9 @@ class DiscreteKSwapsEmitter(ribs.emitters.EmitterBase):
         Mapping Hearthstone Deck Spaces through MAP-Elites with Sliding Boundaries
         Fontaine et al
         https://arxiv.org/pdf/1904.10656v1.pdf
-    Only one of these should be used
     """
 
-    def __init__(self, archive: ribs.archives.ArchiveBase, initial_elite: List, option_pool: Iterable, batch_size: int, num_top_elites: int):
+    def __init__(self, archive: ribs.archives.ArchiveBase, initial_elite: List, option_pools: List, batch_size: int):
         """
         archive: the associated archive
         initial_solution: the initial solution to start from
@@ -31,8 +30,9 @@ class DiscreteKSwapsEmitter(ribs.emitters.EmitterBase):
         batch_size: the number of elites to ask and tell
         num_top_elites: the number of elites to iterate on
         """
+        assert len(initial_elite) == len(option_pools)
         super().__init__(archive, len(initial_elite), None)
-        self.__option_pool = set(option_pool)
+        self.__option_pools = set(option_pools)
         self.__batch_size = batch_size
 
     def __pick_k(self):
@@ -55,10 +55,10 @@ class DiscreteKSwapsEmitter(ribs.emitters.EmitterBase):
     def __mutate_elite(self, elite):
         k = self.__pick_k()
         to_replace = set(random.choices(range(len(elite)), k=k))
-        new_options = self.__option_pool.difference(elite)
         new_elite = []
         for i, entry in enumerate(elite):
             if i in to_replace:
+                new_options = self.__option_pools[i].difference(elite)
                 possible_values = new_options.difference(new_elite)
                 value = random.choice(possible_values)
             else:
@@ -107,7 +107,12 @@ def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report
     archive = ExtendedGridArchive(params.grid_size, params.bounds)
     input_bounds = get_me_params_bounds()
     initial_routes = [MoonBoardRoute.make_random_valid() for _ in range(params.num_emitters)]
-    x0s = [route_to_ME_params(r) for r in initial_routes]
+    # x0s = [route_to_ME_params(r) for r in initial_routes]
+    emitters = [DiscreteKSwapsEmitter(
+        archive=archive,
+        initial_elite=x0s[i],
+
+    )]
     emitters = [
         ribs.emitters.ImprovementEmitter(
             archive=archive, 
