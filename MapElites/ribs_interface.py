@@ -1,7 +1,7 @@
 import multiprocessing as mp
 import os
 import time
-from typing import Dict, List
+from typing import Iterable, List
 import matplotlib.pyplot as plt
 import ribs
 import ribs.visualize
@@ -12,18 +12,79 @@ from MapElites.me_utils import MEParams, get_me_params_bounds, route_to_ME_param
 import util
 from MapElites.tracking import ExperimentAggregator, ExtendedGridArchive, Logger
 
+import random
 
-class DiscreteKSwaps(ribs.emitters.EmitterBase):
+class DiscreteKSwapsEmitter(ribs.emitters.EmitterBase):
     """
-    Derived from https://arxiv.org/pdf/1904.10656v1.pdf
+    Derived from 
+        Mapping Hearthstone Deck Spaces through MAP-Elites with Sliding Boundaries
+        Fontaine et al
+        https://arxiv.org/pdf/1904.10656v1.pdf
     """
 
-    def __init__(archive, solution_dim, bounds):
-        super().__init__(archive, solution_dim, bounds)
-    
+    def __init__(self, archive: ribs.archives.ArchiveBase, initial_elite: List, option_pool: Iterable, batch_size: int, num_top_elites: int):
+        """
+        archive: the associated archive
+        initial_solution: the initial solution to start from
+        option_pool: the pool of possible elements of an elite
+        batch_size: the number of elites to ask and tell
+        num_top_elites: the number of elites to iterate on
+        """
+        super().__init__(archive, len(initial_elite), None)
+        self.__option_pool = set(option_pool)
+        self.__num_top_elites = num_top_elites
+        self.__elites = [initial_elite.copy() for _ in range(num_top_elites)]
+        self.__fitnesses = [0 for _ in range(len(self.__elites))]
+        self.__batch_size = batch_size
 
-    
-    
+    def __pick_k(self):
+        """
+        P(k) = 0.5 * P(k-1)
+        P(1) = 0.5
+        """
+        while True:
+            r = random.random()
+            k = 1
+            while r < 0.5 ** k:
+                k += 1
+            if k < self.solution_dim:
+                break
+        return k
+
+    def __select_elite(self, elites):
+        return random.choice(elites)
+
+    def __get_best_elites(self):
+        fit_elites = sorted(zip(self.__fitnesses, self.__elites), key=lambda x: x[0])
+        return [x[1] for x in fit_elites][:self.__num_top_elites]
+
+    def __mutate_elite(self, elite):
+        k = self.__pick_k()
+        to_replace = set(random.choices(range(len(elite)), k=k))
+        new_options = self.__option_pool.difference(elite)
+        new_elite = []
+        for i, entry in enumerate(elite):
+            if i in to_replace:
+                possible_values = new_options.difference(new_elite)
+                value = random.choice(possible_values)
+            else:
+                value = entry
+            new_elite.append(value)
+        return new_elite
+ 
+    def ask(self):
+        best_elites = self.__get_best_elites(self.__elites)
+        elites = []
+        for _ in range(self.__batch_size):
+            elite = self.__select_elite(best_elites)
+            new_elite = self.__mutate_elite(elite)
+            elites.append(new_elite)
+        self.__elites = elites
+        return elites.copy()
+            
+    def tell(self, scores, behaviors):
+        """ make sure to sort and set self.__elites """
+        self.__fitnesses = scores.copy()
 
 
 def grade_string_to_num(grade: str) -> int:
