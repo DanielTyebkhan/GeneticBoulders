@@ -10,7 +10,6 @@ class MEParams:
     grid_size: Tuple[int, int]
     bounds: List[Tuple[int, int]]
     batch_size: int
-    sigma_0: float
     num_emitters: int
     iterations: int
 
@@ -35,13 +34,15 @@ def route_to_ME_params(route: MoonBoardRoute):
     ]
     """
     nmid = route.num_mid_holds()
-    return [route.start_holds[0], route.end_holds[0], route.mid_holds] + [None for _ in range(mu.MAX_MID_HOLDS - nmid)]
+    arr = [route.start_holds[0], route.end_holds[0]] + route.mid_holds
+    return [MoonBoardRoute.hold_to_valid_index(h) for h in arr] + [-1 for _ in range(mu.MAX_MID_HOLDS - nmid)]
     
 
 def ME_params_to_route(in_params: List[int]) -> MoonBoardRoute:
-    start = in_params[0]
-    end = in_params[1]
-    mid = [x for x in in_params[2:] if x is not None]
+    holds = [MoonBoardRoute.valid_index_to_hold(x) for x in in_params if x != -1]
+    start = holds[0]
+    end = holds[1]
+    mid = holds[2:]
     return MoonBoardRoute(start_holds=[start], end_holds=[end], mid_holds=mid)
 
 

@@ -23,7 +23,7 @@ class DiscreteKSwapsEmitter(ribs.emitters.EmitterBase):
         https://arxiv.org/pdf/1904.10656v1.pdf
     """
 
-    def __init__(self, archive: ribs.archives.ArchiveBase, initial_elite: List, option_pools: List, batch_size: int):
+    def __init__(self, archive: ribs.archives.ArchiveBase, initial_elite: List[int], option_pools: List[List[int]], batch_size: int):
         """
         archive: the associated archive
         initial_solution: the initial solution to start from
@@ -33,27 +33,34 @@ class DiscreteKSwapsEmitter(ribs.emitters.EmitterBase):
         """
         assert len(initial_elite) == len(option_pools)
         super().__init__(archive, len(initial_elite), None)
-        self.__option_pools = set(option_pools)
+        self.__initial_elite = initial_elite
+        self.__option_pools = [set(p) for p in option_pools]
         self.__batch_size = batch_size
+        self.__first_ask = True
 
     def __pick_k(self):
         """
         P(k) = 0.5 * P(k-1)
         P(1) = 0.5
         """
+        k_offset = 0
         while True:
             r = random.random()
-            k = 1
-            while r < 0.5 ** k:
+            k = 1 + k_offset
+            while r < 0.5 ** (k - k_offset):
                 k += 1
             if k < self.solution_dim:
                 break
         return k
 
     def __select_elite(self):
-        return self.archive.get_random_elite()
+        sol, _, _, *_ = self.archive.get_random_elite()
+        return [int(i) for i in sol]
 
-    def __mutate_elite(self, elite):
+    def __mutated_elite(self, elite):
+        """
+        does not mutate input, returns new mutated form
+        """
         k = self.__pick_k()
         to_replace = set(random.choices(range(len(elite)), k=k))
         new_elite = []
@@ -61,19 +68,20 @@ class DiscreteKSwapsEmitter(ribs.emitters.EmitterBase):
             if i in to_replace:
                 new_options = self.__option_pools[i].difference(elite)
                 possible_values = new_options.difference(new_elite)
-                value = random.choice(possible_values)
+                value = random.choice(list(possible_values))
             else:
                 value = entry
             new_elite.append(value)
         return new_elite
  
     def ask(self):
-        elites = []
-        for _ in range(self.__batch_size):
-            elite = self.__select_elite()
-            new_elite = self.__mutate_elite(elite)
-            elites.append(new_elite)
-        return elites
+        batch_size = self.__batch_size
+        if self.__first_ask:
+            self.__first_ask = False
+            elites = [self.__initial_elite for _ in range(batch_size)]
+        else:
+            elites = [self.__select_elite() for _ in range(batch_size)]
+        return [self.__mutated_elite(e) for e in elites]
             
     def tell(self, solutions: List[List], objective_values: List[float], behavior_values: List[List[float]], metadata=None):
         for elite, fitness, behavior in zip(solutions, objective_values, behavior_values):
@@ -102,17 +110,23 @@ def eval_fitness(route: MoonBoardRoute, target_grade: int, gradenet: GradeNet, f
 
 
 def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report_frequency: int=25):
+    print(
+        'starting'
+    )
     logger = Logger()
     target = grade_string_to_num(target_grade)
     gradenet = GradeNet()
     archive = ExtendedGridArchive(params.grid_size, params.bounds)
     initial_routes = [MoonBoardRoute.make_random_valid() for _ in range(params.num_emitters)]
     x0s = [route_to_ME_params(r) for r in initial_routes ]
-    option_pools = [START_HOLDS, END_HOLDS, MID_HOLDS + [None] for _ in range(MAX_MID_HOLDS)]
+    start_indices = [MoonBoardRoute.hold_to_valid_index(h) for h in START_HOLDS]
+    end_indices = [MoonBoardRoute.hold_to_valid_index(h) for h in END_HOLDS]
+    mid_indices = [MoonBoardRoute.hold_to_valid_index(h) for h in MID_HOLDS]
+    option_pools = [start_indices, end_indices] + [mid_indices + [-1] for _ in range(MAX_MID_HOLDS)]
     emitters = [DiscreteKSwapsEmitter(
         archive=archive,
         initial_elite=x0s[i],
-        option_poosls=option_pools,
+        option_pools=option_pools,
         batch_size=params.batch_size
     ) for i in range(params.num_emitters)]
     optimizer = ribs.optimizers.Optimizer(archive, emitters)
