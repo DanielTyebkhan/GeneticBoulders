@@ -123,6 +123,10 @@ class MoonBoardRoute:
         x_vectors = self.beta.to_x_vectors()
         return x_vectors
 
+    def purge_holds(self, feature_dict=None):
+        self.init_beta(feature_dict)
+        unused = self.beta.holdsNotUsed
+
     def init_beta(self, feature_dict=None):
         if self.beta is None:
             route_id = self.get_id_str()
