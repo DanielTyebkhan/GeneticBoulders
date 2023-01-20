@@ -81,9 +81,9 @@ class MoonBoardRoute:
         return len({HOLD_TYPES[h] for h in self.get_all_holds()})
 
     def get_max_span(self, feature_dict=None):
-        self.init_beta(feature_dict)
-        coords = [MoonBoardHold.from_xy(int(h[6]), int(h[7])) for h in self.beta.allHolds]
-        joined = zip(self.beta.handOperator, self.beta.handSequence)
+        beta = self.get_beta(feature_dict)
+        coords = [MoonBoardHold.from_xy(int(h[6]), int(h[7])) for h in beta.allHolds]
+        joined = zip(beta.handOperator, beta.handSequence)
         left = next(joined)[1]
         right = next(joined)[1]
         while True:
@@ -119,19 +119,21 @@ class MoonBoardRoute:
         return x_vectors
 
     def to_x_vectors(self, feature_dict=None):
-        self.init_beta(feature_dict)
-        x_vectors = self.beta.to_x_vectors()
+        beta = self.get_beta(feature_dict)
+        x_vectors = beta.to_x_vectors()
         return x_vectors
 
     def purge_holds(self, feature_dict=None):
-        self.init_beta(feature_dict)
-        unused = self.beta.holdsNotUsed
+        beta = self.get_beta(feature_dict)
+        unused = beta.holdsNotUsed
+        print(unused)
 
-    def init_beta(self, feature_dict=None):
+    def get_beta(self, feature_dict=None) -> ph.beta:
         if self.beta is None:
             route_id = self.get_id_str()
             data_dict = {route_id: self.classify_and_reorganize_data_ga(feature_dict=feature_dict)}
             self.beta = ph.produce_sequence(route_id, data_dict, printout=False)[0]
+        return self.beta
 
 
     ### Static Methods ###
