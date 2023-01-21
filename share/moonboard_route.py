@@ -82,7 +82,7 @@ class MoonBoardRoute:
 
     def get_max_span(self, feature_dict=None):
         beta = self.get_beta(feature_dict)
-        coords = [MoonBoardHold.from_xy(int(h[6]), int(h[7])) for h in beta.allHolds]
+        coords = [MoonBoardHold.from_beta_vector(v) for v in beta.allHolds]
         joined = zip(beta.handOperator, beta.handSequence)
         left = next(joined)[1]
         right = next(joined)[1]

@@ -31,6 +31,9 @@ class MoonBoardHold:
     def from_xy(x, y):
         return MoonBoardHold(row=y, col=x)
 
+    def from_beta_vector(beta_vec):
+        return MoonBoardHold.from_xy(int(beta_vec[6]), int(beta_vec[7]))
+
 
 MoonBoardHolds = List[MoonBoardHold]
 
