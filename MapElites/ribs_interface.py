@@ -97,7 +97,8 @@ def eval_fitness(route: MoonBoardRoute, target_grade: int, gradenet: GradeNet, f
     fitness = -1
     try:
         if route.is_valid():
-            grade = gradenet.grade_route(route)
+            route.purge_holds(feature_dict)
+            grade = gradenet.grade_route(route, feature_dict)
             num_grade = grade_string_to_num(grade)
             diff = abs(target_grade - num_grade)
             if diff == 0:
@@ -105,6 +106,7 @@ def eval_fitness(route: MoonBoardRoute, target_grade: int, gradenet: GradeNet, f
             else:
                 fitness = 1/diff
     except Exception as ex:
+        print(f'Exception evaluating fitness {ex}')
         fitness = 0
     return fitness
 

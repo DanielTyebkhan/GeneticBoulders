@@ -3,7 +3,7 @@ from MapElites.me_utils import MEParams
 import MapElites.ribs_interface as me
 
 def main():
-    num_reps = 30
+    num_reps = 1
     population_size = 50
     num_emitters = 5
     batch_size = population_size // num_emitters

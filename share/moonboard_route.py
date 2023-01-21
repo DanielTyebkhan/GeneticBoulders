@@ -126,7 +126,15 @@ class MoonBoardRoute:
     def purge_holds(self, feature_dict=None):
         beta = self.get_beta(feature_dict)
         unused = beta.holdsNotUsed
-        print(unused)
+        for index in unused:
+            vec = beta.getAllHolds()[index]
+            hold = MoonBoardHold.from_beta_vector(vec)
+            if hold in self.start_holds:
+                self.start_holds.remove(hold)
+            if hold in self.mid_holds:
+                self.mid_holds.remove(hold)
+            if hold in self.start_holds:
+                self.end_holds.remove(hold)
 
     def get_beta(self, feature_dict=None) -> ph.beta:
         if self.beta is None:
