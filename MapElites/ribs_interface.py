@@ -151,7 +151,8 @@ def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report
             elapsed_time = time.time() - start_time
             print(f"> {itr} itrs completed after {elapsed_time:.2f} s")
             print(f"  - Archive Size: {len(archive)}")
-            print(f"  - Max Score: {archive.stats.obj_max}")
+            print(f"  -    Max Score: {archive.stats.obj_max}")
+            print(f"  -     QD Score: {archive.qd_score()}")
     
     output_dir = os.path.join(save_path, str(time.time()))
     os.makedirs(output_dir, exist_ok=True)
