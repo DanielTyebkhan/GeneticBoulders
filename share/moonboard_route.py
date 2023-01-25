@@ -11,8 +11,8 @@ from MoonBoardRNN.BetaMove.BetaMove import load_feature_dict
 
 class MoonBoardRoute:
     """
-    MoonBoard route representation
-    Designed for A, B, and Original School hold sets
+    2016 MoonBoard route representation
+    Designed for A, B, and Original School hold sets 
     """
 
     def __init__(self, *, start_holds: MoonBoardHolds, mid_holds: MoonBoardHolds, end_holds: MoonBoardHolds, id: Optional[UUID] = None):
@@ -23,29 +23,29 @@ class MoonBoardRoute:
         self.end_holds = end_holds
         self.beta = None
 
-    def get_id_str(self):
+    def get_id_str(self) -> str:
         return str(self.id)
 
-    def num_holds(self):
+    def num_holds(self) -> int:
         return self.num_starting_holds() + self.num_mid_holds() + self.num_end_holds()
 
-    def num_starting_holds(self):
+    def num_starting_holds(self) -> int:
         return len(self.start_holds)
 
-    def num_end_holds(self):
+    def num_end_holds(self) -> int:
         return len(self.end_holds)
 
-    def num_mid_holds(self):
+    def num_mid_holds(self) -> int:
         return len(self.mid_holds)
 
     def get_all_holds(self) -> MoonBoardHolds:
         return self.start_holds + self.mid_holds + self.end_holds
 
-    def to_strings(self):
+    def to_strings(self) -> List[str]:
         holds = self.get_all_holds()
         return [h.to_coordinate_string() for h in holds]
 
-    def has_feasible_path(self):
+    def has_feasible_path(self) -> bool:
         """
         Is there a path through the route in which every move can be spanned?
         """
@@ -60,7 +60,7 @@ class MoonBoardRoute:
             return False
         return dfs(set(self.get_all_holds()), self.start_holds[0], self.end_holds[0], set())
 
-    def is_valid(self):
+    def is_valid(self) -> bool:
         """
         Check that the route conforms to restrictions:
             - TODO: if there are two start/end holds, they must be reachable at the same time 
@@ -77,10 +77,13 @@ class MoonBoardRoute:
         valid = all(conditions)
         return valid
 
-    def get_hold_variety(self):
+    def get_hold_variety(self) -> int:
+        """
+        returns the number of hold types present in the route.
+        """
         return len({HOLD_TYPES[h] for h in self.get_all_holds()})
 
-    def get_max_span(self, feature_dict=None):
+    def get_max_span(self, feature_dict=None) -> float:
         beta = self.get_beta(feature_dict)
         coords = [MoonBoardHold.from_beta_vector(v) for v in beta.allHolds]
         joined = zip(beta.handOperator, beta.handSequence)
@@ -124,6 +127,9 @@ class MoonBoardRoute:
         return x_vectors
 
     def purge_holds(self, feature_dict=None):
+        """
+        removes holds not used in the detected beta
+        """
         beta = self.get_beta(feature_dict)
         unused = beta.holdsNotUsed
         for index in unused:
@@ -147,13 +153,15 @@ class MoonBoardRoute:
     ### Static Methods ###
 
     def from_hold_strings(*, start_holds: List[str], mid_holds: List[str], end_holds: List[str]):
+        """
+        Converts a list of MoonBoard hold position strings (e.g. 'F5') to a MoonBoardRoute
+        """
         start_holds = MoonBoardHold.from_string_list(start_holds)
         mid_holds = MoonBoardHold.from_string_list(mid_holds)
         end_holds = MoonBoardHold.from_string_list(end_holds)
         return MoonBoardRoute(start_holds=start_holds, mid_holds=mid_holds, end_holds=end_holds)
 
     def make_random():
-        # can randomize num start and end holds in future
         num_start = 1
         num_end = 1
         num_mid = random.randint(MIN_MID_HOLDS, MAX_MID_HOLDS)

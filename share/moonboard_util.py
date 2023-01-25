@@ -98,12 +98,4 @@ REACH_GRAPH = {hold: {h for h in ALL_HOLDS if DIST_GRAPH[hold][h] < CLIMBER_ARMS
 
 HOLD_TYPES = load_hold_types('holdtypes.csv')
 
-def hold_string_range(row: int, start_col: str, end_col: str):
-    holds = []
-    col = start_col
-    while col <= end_col:
-        holds.append(col + str(row))
-        col = chr(ord(col) + 1)
-    return holds
-
 

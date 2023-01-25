@@ -8,7 +8,7 @@ import ribs.visualize
 from MoonBoardRNN.GradeNet.grade_net import GradeNet
 from MoonBoardRNN.BetaMove.BetaMove import load_feature_dict
 from share.moonboard_route import MoonBoardRoute
-from MapElites.me_utils import MEParams, get_me_params_bounds, route_to_ME_params, ME_params_to_route
+from MapElites.me_utils import MEParams, route_to_ME_params, ME_params_to_route
 from share.moonboard_util import END_HOLDS, MAX_MID_HOLDS, MID_HOLDS, MIN_MID_HOLDS, START_HOLDS
 import util
 from MapElites.tracking import ExperimentAggregator, ExtendedGridArchive, Logger
@@ -38,7 +38,7 @@ class DiscreteKSwapsEmitter(ribs.emitters.EmitterBase):
         self.__batch_size = batch_size
         self.__first_ask = True
 
-    def __pick_k(self):
+    def __pick_k(self) -> int:
         """
         P(k) = 0.5 * P(k-1)
         P(1) = 0.5
@@ -53,11 +53,11 @@ class DiscreteKSwapsEmitter(ribs.emitters.EmitterBase):
                 break
         return k
 
-    def __select_elite(self):
+    def __select_elite(self) -> List[int]:
         sol, _, _, *_ = self.archive.get_random_elite()
         return [int(i) for i in sol]
 
-    def __mutated_elite(self, elite):
+    def __mutated_elite(self, elite) -> List[int]:
         """
         does not mutate input, returns new mutated form
         """
@@ -74,7 +74,7 @@ class DiscreteKSwapsEmitter(ribs.emitters.EmitterBase):
             new_elite.append(value)
         return new_elite
  
-    def ask(self):
+    def ask(self) -> List[List[int]]:
         batch_size = self.__batch_size
         if self.__first_ask:
             self.__first_ask = False
@@ -83,7 +83,7 @@ class DiscreteKSwapsEmitter(ribs.emitters.EmitterBase):
             elites = [self.__select_elite() for _ in range(batch_size)]
         return [self.__mutated_elite(e) for e in elites]
             
-    def tell(self, solutions: List[List], objective_values: List[float], behavior_values: List[List[float]], metadata=None):
+    def tell(self, solutions: List[List[float]], objective_values: List[float], behavior_values: List[List[float]], metadata=None) -> None:
         for elite, fitness, behavior in zip(solutions, objective_values, behavior_values):
             self.archive.add(elite, fitness, behavior)
         
@@ -93,7 +93,10 @@ def grade_string_to_num(grade: str) -> int:
     return int(grade[1:])
 
 
-def eval_fitness(route: MoonBoardRoute, target_grade: int, gradenet: GradeNet, feature_dict=None):
+def eval_fitness(route: MoonBoardRoute, target_grade: int, gradenet: GradeNet, feature_dict=None) -> float:
+    """
+    TODO: alter fitness to prefer fewer holds
+    """
     fitness = -1
     try:
         if route.is_valid():
@@ -111,7 +114,7 @@ def eval_fitness(route: MoonBoardRoute, target_grade: int, gradenet: GradeNet, f
     return fitness
 
 
-def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report_frequency: int=25):
+def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report_frequency: int=25) -> Logger:
     logger = Logger()
     target = grade_string_to_num(target_grade)
     gradenet = GradeNet()
@@ -145,7 +148,7 @@ def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report
         print('')
 
         optimizer.tell(objc, bcs)
-        logger.add_archive(itr, archive)
+        logger.add_archive(archive)
 
         if itr % report_frequency == 0:
             elapsed_time = time.time() - start_time
@@ -160,7 +163,6 @@ def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report
     logger_pickle_path = os.path.join(output_dir, 'logger.p')
     util.save_pickle(archive, archive_pickle_path)
     util.save_pickle(logger, logger_pickle_path)
-    # viz_archive(archive, output_dir)
     return logger
 
 def __thread_target(target_grade, params, save_path, report_frequency) -> List[Logger]:

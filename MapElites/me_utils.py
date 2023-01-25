@@ -14,28 +14,22 @@ class MEParams:
     iterations: int
 
 
-ROUTE_START_COUNT_I = 0
-ROUTE_END_COUNT_I = 3
-ROUTE_MID_COUNT_I = 6
-
-
-def continuous_to_discrete(cont_val: float):
+def continuous_to_discrete(cont_val: float) -> int:
     return math.ceil(cont_val)
 
 
-def continuous_to_discrete_vals(vals: List[float]):
+def continuous_to_discrete_vals(vals: List[float]) -> List[int]:
     return [continuous_to_discrete(v) for v in vals]
     
 
-def route_to_ME_params(route: MoonBoardRoute):
+def route_to_ME_params(route: MoonBoardRoute) -> List[int]:
     """
-    format: [
-        start_hold, end_hold, num_mid, ...mid_holds
-    ]
+    Returns a 13 element array of hold indices.
+    A value of -1 indicates no hold
     """
     nmid = route.num_mid_holds()
     arr = [route.start_holds[0], route.end_holds[0]] + route.mid_holds
-    return [MoonBoardRoute.hold_to_valid_index(h) for h in arr] + [-1 for _ in range(mu.MAX_MID_HOLDS - nmid)]
+    return [MoonBoardRoute.hold_to_valid_index(h) for h in arr] + ([-1] * (mu.MAX_MID_HOLDS - nmid))
     
 
 def ME_params_to_route(in_params: List[int]) -> MoonBoardRoute:
@@ -46,7 +40,10 @@ def ME_params_to_route(in_params: List[int]) -> MoonBoardRoute:
     return MoonBoardRoute(start_holds=[start], end_holds=[end], mid_holds=mid)
 
 
-def get_me_params_bounds():
+def get_me_params_bounds() -> List[float]:
+    """
+    Deprecated param bounds from float representation of MoonBoard Elites
+    """
     min_mid_holds = mu.MIN_MID_HOLDS
     max_mid_holds = mu.MAX_MID_HOLDS
     start_range = (mu.MIN_START_INDEX - 1, mu.MAX_START_INDEX)
