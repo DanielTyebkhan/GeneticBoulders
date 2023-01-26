@@ -66,8 +66,9 @@ class DiscreteKSwapsEmitter(ribs.emitters.EmitterBase):
         new_elite = []
         for i, entry in enumerate(elite):
             if i in to_replace:
-                new_options = self.__option_pools[i].difference(elite)
-                possible_values = new_options.difference(new_elite)
+                used_holds = set(elite + new_elite).difference([-1])
+                options = self.__option_pools[i]
+                possible_values = options.difference(used_holds)
                 value = random.choice(list(possible_values))
             else:
                 value = entry
