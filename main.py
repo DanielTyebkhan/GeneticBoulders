@@ -10,7 +10,7 @@ def main():
     iterations = 300
     params = MEParams(
         (3, 4), [(1, 4), (2, 6)], batch_size, num_emitters, iterations)
-    grades = ['V4', 'V6', 'V8', 'V9']
+    grades = ['V4', 'V5', 'V6', 'V7', 'V8', 'V9', 'V10', 'V11', 'V12', 'V13']
     for grade in grades:
         me.parallel_experiment(grade, params, os.path.join('results', grade), num_reps, 6)
 
