@@ -95,20 +95,16 @@ def grade_string_to_num(grade: str) -> int:
 
 
 def eval_fitness(route: MoonBoardRoute, target_grade: int, gradenet: GradeNet, feature_dict=None) -> float:
-    """
-    TODO: alter fitness to prefer fewer holds
-    """
-    fitness = -1
+    fitness = 0
     try:
         if route.is_valid():
             route.purge_holds(feature_dict)
             grade = gradenet.grade_route(route, feature_dict)
             num_grade = grade_string_to_num(grade)
-            diff = abs(target_grade - num_grade)
-            if diff == 0:
-                fitness = 1
-            else:
-                fitness = 1/diff
+            g_diff = abs(target_grade - num_grade)
+            holds = route.num_holds()
+            score = g_diff + holds * 0.01
+            fitness = 1 / score
     except Exception as ex:
         print(f'Exception evaluating fitness {ex}')
         fitness = 0
