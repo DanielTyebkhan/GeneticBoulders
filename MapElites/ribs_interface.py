@@ -17,16 +17,14 @@ import random
 
 class RandomEmitter(ribs.emitters.EmitterBase):
     """
-    Baseline --> Just makes random routes for ask
+    Baseline Emitter --> Just makes random routes for ask()
     """
 
     def __init__(self, archive: ribs.archives.ArchiveBase, batch_size: int):
         """
         archive: the associated archive
-        initial_solution: the initial solution to start from
         option_pool: the pool of possible elements of an elite
         batch_size: the number of elites to ask and tell
-        num_top_elites: the number of elites to iterate on
         """
         super().__init__(archive, len(RandomEmitter.__make_elite()), None)
         self.__batch_size = batch_size
@@ -55,7 +53,6 @@ class DiscreteKSwapsEmitter(ribs.emitters.EmitterBase):
         initial_solution: the initial solution to start from
         option_pool: the pool of possible elements of an elite
         batch_size: the number of elites to ask and tell
-        num_top_elites: the number of elites to iterate on
         """
         assert len(initial_elite) == len(option_pools)
         super().__init__(archive, len(initial_elite), None)
