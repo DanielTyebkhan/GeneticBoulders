@@ -1,3 +1,4 @@
+import itertools
 from math import sqrt
 from typing import Dict, List
 from dataclasses import dataclass
@@ -63,6 +64,8 @@ def load_hold_types(path: str) -> Dict[MoonBoardHold, int]:
     return types
 
 
+def hold_distance(h1: MoonBoardHold, h2: MoonBoardHold) -> float:
+    return util.euclid_distance((h1.col, h1.row), (h2.col, h2.row)) * HOLE_DISTANCE
 
 
 COLUMNS = 11
@@ -93,8 +96,9 @@ END_HOLDS = ALL_HOLDS[MIN_END_INDEX:MAX_END_INDEX+1]
 
 HOLE_DISTANCE = 7.875  # square edge size in inches between holds on moonboard
 CLIMBER_ARMSPAN = 60
-DIST_GRAPH = {hold: {h: util.euclid_distance((hold.col, hold.row), (h.col, h.row)) * HOLE_DISTANCE for h in ALL_HOLDS} for hold in ALL_HOLDS}
+DIST_GRAPH = {hold: {h: hold_distance(hold, h) for h in ALL_HOLDS} for hold in ALL_HOLDS}
 REACH_GRAPH = {hold: {h for h in ALL_HOLDS if DIST_GRAPH[hold][h] < CLIMBER_ARMSPAN} for hold in ALL_HOLDS}
+START_OPTIONS = [(x, ) for x in START_HOLDS] + [x for x in itertools.product(START_HOLDS, START_HOLDS) if x[0] in REACH_GRAPH[x[1]]]
 
 HOLD_TYPES = load_hold_types('holdtypes.csv')
 
