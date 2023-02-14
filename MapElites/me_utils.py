@@ -32,17 +32,23 @@ def route_to_ME_params(route: MoonBoardRoute) -> List[int]:
     A value of -1 indicates no hold
     """
     nmid = route.num_mid_holds()
-    
-    arr = [route.start_holds[0], route.end_holds[0]] + route.mid_holds
-    return [MoonBoardRoute.hold_to_valid_index(h) for h in arr] + ([-1] * (mu.MAX_MID_HOLDS - nmid))
+    nstart = route.num_starting_holds()
+    if len(nstart) == 1:
+        start_holds = (route.start_holds[0],)
+    else:
+        start_holds = (route.start_holds[0], route.start_holds[1])
+        if start_holds not in mu.START_OPTIONS_MAPPING:
+            start_holds = (start_holds[1], start_holds[0])
+            assert start_holds in mu.START_OPTIONS_MAPPING
+    arr = route.end_holds + route.mid_holds
+    return [mu.START_OPTIONS_MAPPING[start_holds]] + [MoonBoardRoute.hold_to_valid_index(h) for h in arr] + ([-1] * (mu.MAX_MID_HOLDS - nmid))
     
 
 def ME_params_to_route(in_params: List[int]) -> MoonBoardRoute:
-    holds = [MoonBoardRoute.valid_index_to_hold(x) for x in in_params if x != -1]
-    start = holds[0]
-    end = holds[1]
-    mid = holds[2:]
-    return MoonBoardRoute(start_holds=[start], end_holds=[end], mid_holds=mid)
+    start = mu.START_OPTIONS[in_params[0]]
+    end = MoonBoardRoute.valid_index_to_hold[in_params[1]]
+    mid = [MoonBoardRoute.valid_index_to_hold(x) for x in in_params[2:] if x != -1]
+    return MoonBoardRoute(start_holds=list(start), end_holds=[end], mid_holds=mid)
 
 
 def get_me_params_bounds() -> List[float]:

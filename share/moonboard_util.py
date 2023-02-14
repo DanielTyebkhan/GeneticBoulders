@@ -1,5 +1,4 @@
 import itertools
-from math import sqrt
 from typing import Dict, List
 from dataclasses import dataclass
 import util
@@ -78,7 +77,7 @@ MAX_START_HOLDS = 1
 MIN_END_HOLDS = 1
 MAX_END_HOLDS = 1
 MIN_MID_HOLDS = 4
-MAX_MID_HOLDS = 12
+MAX_MID_HOLDS = 10
 MAX_HOLDS = 13
 
 __holds = [(0, 17), (0, 15), (0, 14), (0, 13), (0, 12), (0, 11), (0, 10), (0, 9), (0, 8), (0, 4), (1, 17), (1, 15), (1, 14), (1, 12), (1, 11), (1, 10), (1, 9), (1, 8), (1, 7), (1, 6), (1, 5), (1, 3), (1, 2), (2, 17), (2, 15), (2, 14), (2, 13), (2, 12), (2, 11), (2, 10), (2, 9), (2, 8), (2, 7), (2, 6), (2, 5), (2, 4), (3, 2), (3, 17), (3, 16), (3, 15), (3, 14), (3, 13), (3, 12), (3, 11), (3, 10), (3, 9), (3, 8), (3, 7), (3, 6), (3, 5), (3, 4), (4, 17), (4, 15), (4, 14), (4, 13), (4, 12), (4, 11), (4, 10), (4, 9), (4, 8), (4, 7), (4, 6), (4, 5), (5, 15), (5, 14), (5, 13), (5, 12), (5, 11), (5, 10),
@@ -98,8 +97,7 @@ HOLE_DISTANCE = 7.875  # square edge size in inches between holds on moonboard
 CLIMBER_ARMSPAN = 60
 DIST_GRAPH = {hold: {h: hold_distance(hold, h) for h in ALL_HOLDS} for hold in ALL_HOLDS}
 REACH_GRAPH = {hold: {h for h in ALL_HOLDS if DIST_GRAPH[hold][h] < CLIMBER_ARMSPAN} for hold in ALL_HOLDS}
-START_OPTIONS = [(x, ) for x in START_HOLDS] + [x for x in itertools.product(START_HOLDS, START_HOLDS) if x[0] in REACH_GRAPH[x[1]]]
+START_OPTIONS = [(x, ) for x in START_HOLDS] + [x for x in itertools.permutations(START_HOLDS, 2) if x[0] in REACH_GRAPH[x[1]]]
+START_OPTIONS_MAPPING = {p: i for i, p in enumerate(START_OPTIONS)}
 
 HOLD_TYPES = load_hold_types('holdtypes.csv')
-
-
