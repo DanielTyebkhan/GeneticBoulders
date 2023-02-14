@@ -32,6 +32,7 @@ def route_to_ME_params(route: MoonBoardRoute) -> List[int]:
     A value of -1 indicates no hold
     """
     nmid = route.num_mid_holds()
+    
     arr = [route.start_holds[0], route.end_holds[0]] + route.mid_holds
     return [MoonBoardRoute.hold_to_valid_index(h) for h in arr] + ([-1] * (mu.MAX_MID_HOLDS - nmid))
     
