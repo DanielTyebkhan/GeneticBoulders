@@ -154,14 +154,14 @@ def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report
         population = optimizer.ask()
         objc, bcs = [], []
         for ind, individual in enumerate(population):
-            print(f'{itr}: evaluating individual {ind+1}', end='\r')
+            # print(f'{itr}: evaluating individual {ind+1}', end='\r')
             route = ME_params_to_route(individual)
             fitness = eval_fitness(route, target, gradenet, feature_dict)
             hold_variety = route.get_hold_variety()
             max_span = route.get_max_span(feature_dict)
             objc.append(fitness)
             bcs.append([hold_variety, max_span])
-        print('')
+        # print('')
 
         optimizer.tell(objc, bcs)
         logger.add_archive(archive)
