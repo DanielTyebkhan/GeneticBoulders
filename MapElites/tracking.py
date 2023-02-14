@@ -45,7 +45,9 @@ class ExtendedGridArchive(ribs.archives.GridArchive):
         return self.__af_map(statistics.mean)
 
     def grade_diffs_sum(self) -> float:
-        return sum(me_utils.grade_diff_from_fitness(ExtendedGridArchive.elite_to_fitness(e)) for e in self)
+        elite_total = sum(me_utils.grade_diff_from_fitness(ExtendedGridArchive.elite_to_fitness(e)) for e in self)
+        empty_total = 10 * (self.bins - len(self))
+        return elite_total + empty_total
 
 
 ArchiveSelector = Callable[[ExtendedGridArchive], float]
