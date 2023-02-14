@@ -71,6 +71,8 @@ COLUMNS = 11
 ROWS = 18
 MAX_START_ROW = 5  # 0 based indexing
 
+NUM_GRADES = 10
+
 # TODO: increase maxes to 2
 MIN_START_HOLDS = 1
 MAX_START_HOLDS = 1

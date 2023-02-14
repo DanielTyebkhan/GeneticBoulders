@@ -5,7 +5,7 @@ from matplotlib import cbook
 import re
 
 def plot_route(route, save_path=None, show=False):
-    plot_problem(route.to_strings(), save_path=save_path, show=show)
+    plot_problem(route.to_strings(), start_num = route.num_starting_holds(), save_path=save_path, show=show)
 
 def plot_problem(stringList, start_num = 1, title = None, save_path=None, show=False):    
     p_dir = pathlib.Path(__file__).parent

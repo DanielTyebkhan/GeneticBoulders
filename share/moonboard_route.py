@@ -3,10 +3,10 @@ from typing import List, Optional
 
 import numpy as np
 
-from share.moonboard_util import *
 from uuid import UUID, uuid1
 import MoonBoardRNN.BetaMove.preprocessing_helper as ph
 from MoonBoardRNN.BetaMove.BetaMove import load_feature_dict
+from share.moonboard_util import ALL_HOLDS, DIST_GRAPH, END_HOLDS, HOLD_TYPES, MAX_END_HOLDS, MAX_HOLDS, MAX_MID_HOLDS, MAX_START_HOLDS, MAX_START_ROW, MID_HOLDS, MIN_END_HOLDS, MIN_MID_HOLDS, MIN_START_HOLDS, REACH_GRAPH, ROWS, START_OPTIONS, MoonBoardHold, MoonBoardHolds, moonboard_row_to_index
 
 
 class MoonBoardRoute:
@@ -162,10 +162,9 @@ class MoonBoardRoute:
         return MoonBoardRoute(start_holds=start_holds, mid_holds=mid_holds, end_holds=end_holds)
 
     def make_random():
-        num_start = 1
         num_end = 1
         num_mid = random.randint(MIN_MID_HOLDS, MAX_MID_HOLDS)
-        start_holds = random.sample(START_HOLDS, num_start)
+        start_holds = list(random.choice(START_OPTIONS))
         end_holds = random.sample(END_HOLDS, num_end)
         mid_holds = random.sample(MID_HOLDS, num_mid)
         return MoonBoardRoute(start_holds=start_holds, mid_holds=mid_holds, end_holds=end_holds)

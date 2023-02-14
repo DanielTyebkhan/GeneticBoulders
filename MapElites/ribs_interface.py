@@ -9,7 +9,7 @@ from MoonBoardRNN.GradeNet.grade_net import GradeNet
 from MoonBoardRNN.BetaMove.BetaMove import load_feature_dict
 from share.moonboard_route import MoonBoardRoute
 from MapElites.me_utils import MEParams, grade_string_to_num, route_to_ME_params, ME_params_to_route
-from share.moonboard_util import END_HOLDS, MAX_MID_HOLDS, MID_HOLDS, MIN_MID_HOLDS, START_HOLDS
+from share.moonboard_util import END_HOLDS, MAX_MID_HOLDS, MID_HOLDS, MIN_MID_HOLDS, START_HOLDS, START_OPTIONS
 import util
 from MapElites.tracking import ExperimentAggregator, ExtendedGridArchive, Logger
 
@@ -66,7 +66,7 @@ class DiscreteKSwapsEmitter(ribs.emitters.EmitterBase):
         P(k) = 0.5 * P(k-1)
         P(1) = 0.5
         """
-        k_offset = 5
+        k_offset = 1
         while True:
             r = random.random()
             k = 1 + k_offset
@@ -137,7 +137,7 @@ def run_mapelites(*, target_grade: str, params: MEParams, save_path: str, report
     archive = ExtendedGridArchive(params.grid_size, params.bounds)
     initial_routes = [MoonBoardRoute.make_random_valid() for _ in range(params.num_emitters)]
     x0s = [route_to_ME_params(r) for r in initial_routes ]
-    start_indices = [MoonBoardRoute.hold_to_valid_index(h) for h in START_HOLDS]
+    start_indices = list(range(len(START_OPTIONS)))
     end_indices = [MoonBoardRoute.hold_to_valid_index(h) for h in END_HOLDS]
     mid_indices = [MoonBoardRoute.hold_to_valid_index(h) for h in MID_HOLDS]
     option_pools = [start_indices, end_indices] + [mid_indices + [-1] for _ in range(MAX_MID_HOLDS)]

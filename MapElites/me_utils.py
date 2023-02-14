@@ -33,7 +33,7 @@ def route_to_ME_params(route: MoonBoardRoute) -> List[int]:
     """
     nmid = route.num_mid_holds()
     nstart = route.num_starting_holds()
-    if len(nstart) == 1:
+    if nstart == 1:
         start_holds = (route.start_holds[0],)
     else:
         start_holds = (route.start_holds[0], route.start_holds[1])
@@ -46,9 +46,10 @@ def route_to_ME_params(route: MoonBoardRoute) -> List[int]:
 
 def ME_params_to_route(in_params: List[int]) -> MoonBoardRoute:
     start = mu.START_OPTIONS[in_params[0]]
-    end = MoonBoardRoute.valid_index_to_hold[in_params[1]]
+    end = MoonBoardRoute.valid_index_to_hold(in_params[1])
     mid = [MoonBoardRoute.valid_index_to_hold(x) for x in in_params[2:] if x != -1]
-    return MoonBoardRoute(start_holds=list(start), end_holds=[end], mid_holds=mid)
+    route = MoonBoardRoute(start_holds=list(start), end_holds=[end], mid_holds=mid)
+    return route
 
 
 def get_me_params_bounds() -> List[float]:
@@ -69,5 +70,5 @@ def get_me_params_bounds() -> List[float]:
 
 def grade_diff_from_fitness(fit):
     if fit == 0:
-        return 10
+        return mu.NUM_GRADES
     return int(1 / fit)

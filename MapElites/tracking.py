@@ -111,3 +111,6 @@ class ExperimentAggregator:
 
     def plot_grade_diffs(self, save_path: os.PathLike, show: bool=False) -> None:
         self.__plot_ranges(lambda x: x.grade_diffs_sum(), 'Target Grade Distance', save_path, show)
+
+    def get_loggers(self):
+        return self.__loggers
