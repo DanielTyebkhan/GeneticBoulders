@@ -18,6 +18,10 @@ def continuous_to_discrete(cont_val: float) -> int:
     return math.ceil(cont_val)
 
 
+def grade_string_to_num(grade: str) -> int:
+    return int(grade[1:])
+
+
 def continuous_to_discrete_vals(vals: List[float]) -> List[int]:
     return [continuous_to_discrete(v) for v in vals]
     
@@ -55,3 +59,8 @@ def get_me_params_bounds() -> List[float]:
         end_range,
         num_mid_range,
     ] + [mid_range] * max_mid_holds
+
+def grade_diff_from_fitness(fit):
+    if fit == 0:
+        return 10
+    return int(1 / fit)

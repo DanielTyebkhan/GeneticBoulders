@@ -8,7 +8,7 @@ import ribs.visualize
 from MoonBoardRNN.GradeNet.grade_net import GradeNet
 from MoonBoardRNN.BetaMove.BetaMove import load_feature_dict
 from share.moonboard_route import MoonBoardRoute
-from MapElites.me_utils import MEParams, route_to_ME_params, ME_params_to_route
+from MapElites.me_utils import MEParams, grade_string_to_num, route_to_ME_params, ME_params_to_route
 from share.moonboard_util import END_HOLDS, MAX_MID_HOLDS, MID_HOLDS, MIN_MID_HOLDS, START_HOLDS
 import util
 from MapElites.tracking import ExperimentAggregator, ExtendedGridArchive, Logger
@@ -111,10 +111,6 @@ class DiscreteKSwapsEmitter(ribs.emitters.EmitterBase):
         for elite, fitness, behavior in zip(solutions, objective_values, behavior_values):
             self.archive.add(elite, fitness, behavior)
         
-
-
-def grade_string_to_num(grade: str) -> int:
-    return int(grade[1:])
 
 
 def eval_fitness(route: MoonBoardRoute, target_grade: int, gradenet: GradeNet, feature_dict=None) -> float:

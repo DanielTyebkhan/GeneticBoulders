@@ -6,6 +6,8 @@ import copy
 import numpy as np
 import MapElites.visualization as me_viz
 from util import split_percentages
+from MoonBoardRNN.GradeNet import grade_net
+import MapElites.me_utils as me_utils
 
 
 class ExtendedGridArchive(ribs.archives.GridArchive):
@@ -19,7 +21,13 @@ class ExtendedGridArchive(ribs.archives.GridArchive):
         return copy.deepcopy(self)
 
     def all_fitnesses(self) -> Iterable[float]:
-        return map(lambda x: x.obj, self)
+        return map(ExtendedGridArchive.elite_to_fitness, self)
+
+    def elite_to_fitness(elite):
+        return elite.obj
+
+    def elite_to_params(elite):
+        return elite.sol
 
     def __af_map(self, func: Callable[[Iterable[float]], Any]) -> Any:
         return func(self.all_fitnesses())
@@ -35,6 +43,9 @@ class ExtendedGridArchive(ribs.archives.GridArchive):
 
     def average_fitness(self) -> float:
         return self.__af_map(statistics.mean)
+
+    def grade_diffs_sum(self) -> float:
+        return sum(me_utils.grade_diff_from_fitness(ExtendedGridArchive.elite_to_fitness(e)) for e in self)
 
 
 ArchiveSelector = Callable[[ExtendedGridArchive], float]
@@ -95,3 +106,6 @@ class ExperimentAggregator:
 
     def plot_max_fitness(self, save_path: os.PathLike, show: bool=False) -> None:
         self.__plot_ranges(lambda x: x.max_fitness(), 'Max Fitness', save_path, show)
+
+    def plot_grade_diffs(self, save_path: os.PathLike, show: bool=False) -> None:
+        self.__plot_ranges(lambda x: x.grade_diffs_sum(), 'Target Grade Distance', save_path, show)
