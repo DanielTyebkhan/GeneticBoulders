@@ -33,20 +33,20 @@ class ExtendedGridArchive(ribs.archives.GridArchive):
         return func(self.all_fitnesses())
 
     def qd_score(self) -> float:
-        return self.__af_map(sum)
+        return self.stats.qd_score
 
     def max_fitness(self) -> float:
-        return self.__af_map(max)
+        return self.stats.obj_max
 
     def min_fitness(self) -> float:
         return self.__af_map(min)
 
     def average_fitness(self) -> float:
-        return self.__af_map(statistics.mean)
+        return self.stats.obj_mean
 
     def grade_diffs_sum(self) -> float:
         elite_total = sum(me_utils.grade_diff_from_fitness(ExtendedGridArchive.elite_to_fitness(e)) for e in self)
-        empty_total = 10 * (self.bins - len(self))
+        empty_total = me_utils.NUM_GRADES * (self.bins - len(self))
         return elite_total + empty_total
 
 
