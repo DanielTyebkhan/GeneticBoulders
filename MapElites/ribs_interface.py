@@ -121,7 +121,7 @@ def eval_fitness(route: MoonBoardRoute, target_grade: int, gradenet: GradeNet, f
             grade = gradenet.grade_route(route, feature_dict)
             num_grade = grade_string_to_num(grade)
             g_diff = abs(target_grade - num_grade)
-            holds = route.num_holds()
+            holds = route.num_mid_holds()
             score = g_diff + holds * 0.01
             fitness = 1 / score
     except Exception as ex:
