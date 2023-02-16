@@ -1,11 +1,16 @@
-from MapElites.me_utils import ME_params_to_route
+from MapElites.me_utils import ME_params_to_route, grade_diff_from_fitness
 
-from MapElites.tracking import ExperimentAggregator
+from MapElites.tracking import ExperimentAggregator, ExtendedGridArchive
 from MoonBoardRNN.plotting import plot_route
 
-def plot_agg_routes(agg: ExperimentAggregator):
+def plot_agg_routes(agg: ExperimentAggregator, only_target: bool=False):
     for logger in agg.get_loggers():
         archive = logger.archives[-1]
         for elite in archive:
-            route = ME_params_to_route([int(i) for i in elite.sol])
-            plot_route(route)
+            plot = True
+            if only_target:
+                if grade_diff_from_fitness(ExtendedGridArchive.elite_to_fitness(elite)) > 0:
+                    plot = False
+            if plot:
+                route = ME_params_to_route([int(i) for i in elite.sol])
+                plot_route(route)
