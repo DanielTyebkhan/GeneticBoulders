@@ -8,6 +8,7 @@ import MapElites.visualization as me_viz
 from util import split_percentages
 from MoonBoardRNN.GradeNet import grade_net
 import MapElites.me_utils as me_utils
+import share.moonboard_util as mu
 
 
 class ExtendedGridArchive(ribs.archives.GridArchive):
@@ -46,7 +47,7 @@ class ExtendedGridArchive(ribs.archives.GridArchive):
 
     def grade_diffs_sum(self) -> float:
         elite_total = sum(me_utils.grade_diff_from_fitness(ExtendedGridArchive.elite_to_fitness(e)) for e in self)
-        empty_total = me_utils.NUM_GRADES * (self.bins - len(self))
+        empty_total = mu.NUM_GRADES * (self.bins - len(self))
         return elite_total + empty_total
 
 
