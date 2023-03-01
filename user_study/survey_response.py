@@ -1,12 +1,12 @@
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import List, Tuple
 
 from image_link_mapping import IMAGE_LINKS
 
 @dataclass
 class SurveyResponse:
-    calibrations: List[Dict[str, bool]]
-    generated: List[Dict[str, bool]]
+    calibrations: List[Tuple[str, bool]]
+    generated: List[Tuple[str, bool]]
     max_climbed: int
 
     def __init__(self, qualtrics_resp):
@@ -24,5 +24,28 @@ class SurveyResponse:
                 add_to = self.calibrations
             else:
                 add_to = self.generated
-            add_to.append({true_grade: correct})
+            add_to.append((true_grade, correct))
 
+    def max_gradeable(self):
+        return self.max_climbed + 1
+
+    def correct_list(self, ls):
+        return [c for c in ls if c[1]]
+
+    def correct_calibrations(self):
+        return self.correct_list(self.calibrations)
+
+    def correct_generated(self):
+        return self.correct_list(self.generated)
+
+    def perc_gradeable(self, ls):
+        top = self.max_gradeable()
+        valid = [c for c in ls if c[0] <= top]
+        correct = self.correct_list(valid)
+        return len(correct) / len(valid)
+
+    def perc_calibrated_gradeable(self):
+        return self.perc_gradeable(self.calibrations)
+
+    def perc_generated_gradeable(self):
+        return self.perc_gradeable(self.generated)
