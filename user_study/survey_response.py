@@ -3,6 +3,7 @@ from typing import List, Tuple
 
 from image_link_mapping import IMAGE_LINKS
 
+GRADE_ALLOWANCE = 3
 
 @dataclass
 class GradeResponse:
@@ -10,7 +11,7 @@ class GradeResponse:
     predicted: int
 
     def is_correct(self):
-        return self.actual - 1 <= self.predicted <= self.actual + 1
+        return self.actual - GRADE_ALLOWANCE <= self.predicted <= self.actual + GRADE_ALLOWANCE
 
 GradeResponses = List[GradeResponse]
 
@@ -37,16 +38,25 @@ class SurveyResponse:
             add_to.append(GradeResponse(true_grade, guessed_grade))
 
     def max_gradeable(self):
-        return self.max_climbed + 1
+        return self.max_climbed + GRADE_ALLOWANCE
 
     def correct_list(self, ls: GradeResponses):
         return [c for c in ls if c.is_correct()]
+    
+    def incorrect_list(self, ls: GradeResponses):
+        return [c for c in ls if not c.is_correct()]
 
     def correct_calibrations(self):
         return self.correct_list(self.calibrations)
 
     def correct_generated(self):
         return self.correct_list(self.generated)
+
+    def incorrect_calibrations(self):
+        return self.incorrect_list(self.calibrations)
+
+    def incorrect_generated(self):
+        return self.incorrect_list(self.generated)
 
     def perc_gradeable(self, ls: GradeResponses):
         top = self.max_gradeable()
@@ -61,4 +71,7 @@ class SurveyResponse:
         return self.perc_gradeable(self.generated)
 
     def num_pred_higher(self):
-        return []
+        return len([p for p in self.incorrect_generated() if p.predicted < p.actual])
+
+    def num_pred_lower(self):
+        return len([p for p in self.incorrect_generated() if p.predicted > p.actual])
