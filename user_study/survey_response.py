@@ -38,6 +38,12 @@ class SurveyResponse:
     def correct_generated(self):
         return self.correct_list(self.generated)
 
+    def perc_calibration_correct(self):
+        return len(self.correct_calibrations()) / len(self.calibrations)
+
+    def perc_generated_correct(self):
+        return len(self.correct_generated()) / len(self.generated)
+
     def perc_gradeable(self, ls):
         top = self.max_gradeable()
         valid = [c for c in ls if c[0] <= top]
