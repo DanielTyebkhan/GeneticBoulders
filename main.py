@@ -5,7 +5,7 @@ from MapElites.me_utils import MEParams
 import MapElites.ribs_interface as me
 
 def main():
-    num_reps = 6
+    num_reps = 30
     population_size = 25
     num_emitters = 5
     batch_size = population_size // num_emitters
@@ -16,7 +16,7 @@ def main():
     # grades = ['V4', 'V5', 'V6', 'V7', 'V8']
     # grades = ['V9', 'V10', 'V11', 'V12', 'V13']
     # grades = ['V6', 'V7', 'V8']
-    grades = ['V11', 'V12', 'V13']
+    grades = ['V7', 'V9', 'V11', 'V13']
     for grade in grades:
         start_time = datetime.now()
         print(f'Starting {grade} at {start_time}')
