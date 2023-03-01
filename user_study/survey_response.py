@@ -3,10 +3,21 @@ from typing import List, Tuple
 
 from image_link_mapping import IMAGE_LINKS
 
+
+@dataclass
+class GradeResponse:
+    actual: int
+    predicted: int
+
+    def is_correct(self):
+        return self.actual - 1 <= self.predicted <= self.actual + 1
+
+GradeResponses = List[GradeResponse]
+
 @dataclass
 class SurveyResponse:
-    calibrations: List[Tuple[str, bool]]
-    generated: List[Tuple[str, bool]]
+    calibrations: GradeResponses
+    generated: GradeResponses
     max_climbed: int
 
     def __init__(self, qualtrics_resp):
@@ -19,18 +30,17 @@ class SurveyResponse:
             true_grade = int(link.split('_')[0][1:])
             is_calibration = 'calibrate' in link
             guessed_grade = int(qualtrics_resp[question].split()[0][1:])
-            correct = true_grade - 1 <= guessed_grade <= true_grade + 1
             if is_calibration:
                 add_to = self.calibrations
             else:
                 add_to = self.generated
-            add_to.append((true_grade, correct))
+            add_to.append(GradeResponse(true_grade, guessed_grade))
 
     def max_gradeable(self):
         return self.max_climbed + 1
 
-    def correct_list(self, ls):
-        return [c for c in ls if c[1]]
+    def correct_list(self, ls: GradeResponses):
+        return [c for c in ls if c.is_correct()]
 
     def correct_calibrations(self):
         return self.correct_list(self.calibrations)
@@ -38,9 +48,9 @@ class SurveyResponse:
     def correct_generated(self):
         return self.correct_list(self.generated)
 
-    def perc_gradeable(self, ls):
+    def perc_gradeable(self, ls: GradeResponses):
         top = self.max_gradeable()
-        valid = [c for c in ls if c[0] <= top]
+        valid = [c for c in ls if c.actual <= top]
         correct = self.correct_list(valid)
         return len(correct) / len(valid)
 
@@ -49,3 +59,6 @@ class SurveyResponse:
 
     def perc_generated_gradeable(self):
         return self.perc_gradeable(self.generated)
+
+    def num_pred_higher(self):
+        return []
