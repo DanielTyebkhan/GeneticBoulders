@@ -202,9 +202,12 @@ def viz_archive(archive, output_dir):
     # draw_archive_on_board(archive, os.path.join(output_dir, 'board_images'))
 
 def plot_archive_heatmap(archive, save_path):
+    ribs.visualize.grid_archive_heatmap(archive)
     plt.ylabel('Hold Diversity')
     plt.xlabel('Max Span')
-    ribs.visualize.grid_archive_heatmap(archive)
+    plt.grid(axis='both', color='black')
+    bar = plt.gca().collections[-1].colorbar
+    bar.ax.set_xlabel('Fitness')
     plt.savefig(save_path)
 
 def draw_archive_on_board(archive: ribs.archives.GridArchive, save_path):
