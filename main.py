@@ -16,7 +16,7 @@ def main():
     # grades = ['V4', 'V5', 'V6', 'V7', 'V8']
     # grades = ['V9', 'V10', 'V11', 'V12', 'V13']
     # grades = ['V6', 'V7', 'V8']
-    grades = ['V7', 'V9', 'V11', 'V13']
+    grades = ['V13']
     for grade in grades:
         start_time = datetime.now()
         print(f'Starting {grade} at {start_time}')

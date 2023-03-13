@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List, Tuple
 
-from image_link_mapping import IMAGE_LINKS
+from user_study.image_link_mapping import IMAGE_LINKS
 
 GRADE_ALLOWANCE = 1
 
